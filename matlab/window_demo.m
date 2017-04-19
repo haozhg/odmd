@@ -63,8 +63,7 @@ evalsminibatchDMD = zeros(2,m);
 tic
 for k = w+1:m
     AminibatchDMD(:,:,k) = x(:,k-w+1:k)*pinv(x(:,k-w:k-1));
-    evalA = eig(AminibatchDMD(:,:,k));
-    evalsminibatchDMD(:,k) = log(evalA)/dt;
+    evalsminibatchDMD(:,k) = log(eig(AminibatchDMD(:,:,k)))/dt;
 end
 elapsed_time = toc;
 fprintf('Mini-batch DMD, elapsed time: %f seconds\n', elapsed_time)
@@ -73,7 +72,6 @@ fprintf('Mini-batch DMD, elapsed time: %f seconds\n', elapsed_time)
 % window DMD
 q = 20;
 w = q;
-AwindowDMD = zeros(2,2,m);
 evalswindowDMD = zeros(2,m);
 % creat object and initialize with first q snapshot pairs
 wdmd = WindowDMD(2,w);
@@ -82,9 +80,7 @@ wdmd.initialize(x(:,1:q), x(:,2:q+1));
 tic
 for k = q+1:m
     wdmd.update(x(:,k-q), x(:,k-q+1), x(:,k-1), x(:,k));
-    AwindowDMD(:,:,k) = wdmd.A;
-    evalA = eig(AwindowDMD(:,:,k));
-    evalswindowDMD(:,k) = log(evalA)/dt;
+    evalswindowDMD(:,k) = log(eig(wdmd.A))/dt;
 end
 elapsed_time = toc;
 fprintf('Window DMD, elapsed time: %f seconds\n', elapsed_time)

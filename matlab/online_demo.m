@@ -62,15 +62,13 @@ evalsbatchDMD = zeros(2,m);
 tic
 for k = q+1:m
     AbatchDMD(:,:,k) = x(:,2:k)*pinv(x(:,1:k-1));
-    evalA = eig(AbatchDMD(:,:,k));
-    evalsbatchDMD(:,k) = log(evalA)/dt;
+    evalsbatchDMD(:,k) = log(eig(AbatchDMD(:,:,k)))/dt;
 end
 elapsed_time = toc;
 fprintf('Batch DMD, elapsed time: %f seconds\n', elapsed_time)
 
 % Online DMD lambda = 1
 q = 20;
-AonlineDMD = zeros(2,2,m);
 evalsonlineDMD1 = zeros(2,m);
 % creat object and initialize with first q snapshot pairs
 odmd = OnlineDMD(2,1);
@@ -79,16 +77,13 @@ odmd.initialize(x(:,1:q-1),x(:,2:q));
 tic
 for k = q+1:m
     odmd.update(x(:,k-1),x(:,k));
-    AonlineDMD(:,:,k) = odmd.A;
-    evalA = eig(AonlineDMD(:,:,k));
-    evalsonlineDMD1(:,k) = log(evalA)/dt;
+    evalsonlineDMD1(:,k) = log(eig(odmd.A))/dt;
 end
 elapsed_time = toc;
 fprintf('Online DMD, lambda = 1, elapsed time: %f seconds\n', elapsed_time)
 
 % Online DMD, lambda = 0.9
 q = 20;
-AonlineDMD = zeros(2,2,m);
 evalsonlineDMD09 = zeros(2,m);
 % creat object and initialize with first q snapshot pairs
 odmd = OnlineDMD(2,0.9);
@@ -97,9 +92,7 @@ odmd.initialize(x(:,1:q-1),x(:,2:q));
 tic
 for k = q+1:m
     odmd.update(x(:,k-1),x(:,k));
-    AonlineDMD(:,:,k) = odmd.A;
-    evalA = eig(AonlineDMD(:,:,k));
-    evalsonlineDMD09(:,k) = log(evalA)/dt;
+    evalsonlineDMD09(:,k) = log(eig(odmd.A))/dt;
 end
 elapsed_time = toc;
 fprintf('Online DMD, lambda = 0.9, elapsed time: %f seconds\n', elapsed_time)
