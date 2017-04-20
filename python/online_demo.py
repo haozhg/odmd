@@ -42,10 +42,12 @@ def dyn(x,t):
     dxdt = [(1+epsilon*t)*x2,-(1+epsilon*t)*x1]
     return dxdt
 # integrate from initial condition [1,0]    
-t = np.linspace(0,10,101)
+tspan = np.linspace(0,10,101)
 dt = 0.1
 x0 = [1,0]
-x = odeint(dyn,x0,t).T
+xsol = odeint(dyn,x0,tspan).T
+x, y = xsol[:,:-1], xsol[:,1:]
+t = tspan[:-1]
 # true dynamics, true eigenvalues
 n, m = len(x[:,0]), len(x[0,:])
 A = np.empty((n,n,m))
@@ -59,8 +61,8 @@ for k in range(m):
 plt.figure()
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-plt.plot(t, x[0,:], 'bs-', linewidth=2.0,  label='$x_1(t)$')
-plt.plot(t, x[1,:], 'g^-', linewidth=2.0,  label='$x_2(t)$')
+plt.plot(tspan, xsol[0,:], 'bs-', linewidth=2.0,  label='$x_1(t)$')
+plt.plot(tspan, xsol[1,:], 'g^-', linewidth=2.0,  label='$x_2(t)$')
 plt.legend(loc='best',fontsize=20 ,shadow=True)
 plt.xlabel('Time', fontsize=20)
 plt.title('Snapshots', fontsize=20)
@@ -75,7 +77,7 @@ AbatchDMD = np.empty((n,n,m))
 evalsbatchDMD = np.empty((n,m),dtype=complex)
 start = time.clock()
 for k in range(q,m):
-    AbatchDMD[:,:,k] = x[:,1:k+1].dot(np.linalg.pinv(x[:,0:k]))
+    AbatchDMD[:,:,k] = y[:,:k].dot(np.linalg.pinv(x[:,:k]))
     evalsbatchDMD[:,k] = np.log(np.linalg.eigvals(AbatchDMD[:,:,k]))/dt
 end = time.clock()
 print "Batch DMD, time = " + str(end-start) + " secs"
@@ -85,10 +87,10 @@ print "Batch DMD, time = " + str(end-start) + " secs"
 q = 20
 evalsonlineDMD1 = np.empty((n,m),dtype=complex)
 odmd = OnlineDMD(n,1.0)
-odmd.initialize(x[:,0:q-1],x[:,1:q])
+odmd.initialize(x[:,:q],y[:,:q])
 start = time.clock()
 for k in range(q,m):
-    odmd.update(x[:,k-1],x[:,k])
+    odmd.update(x[:,k],y[:,k])
     evalsonlineDMD1[:,k] = np.log(np.linalg.eigvals(odmd.A))/dt
 end = time.clock()
 print "Online DMD, forgetting = 1, time = " + str(end-start) + " secs"
@@ -98,10 +100,10 @@ print "Online DMD, forgetting = 1, time = " + str(end-start) + " secs"
 q = 20
 evalsonlineDMD09 = np.empty((n,m),dtype=complex)
 odmd = OnlineDMD(n,0.9)
-odmd.initialize(x[:,0:q-1],x[:,1:q])
+odmd.initialize(x[:,:q],y[:,:q])
 start = time.clock()
 for k in range(q,m):
-    odmd.update(x[:,k-1],x[:,k])
+    odmd.update(x[:,k],y[:,k])
     evalsonlineDMD09[:,k] = np.log(np.linalg.eigvals(odmd.A))/dt
 end = time.clock()
 print "Online DMD, forgetting = 0.9, time = " + str(end-start) + " secs"
