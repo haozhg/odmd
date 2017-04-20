@@ -9,9 +9,9 @@
 %       where x(k), y(k) are the n dimensional state vector, 
 %       y(k) = f(x(k)) is the image of x(k), f() is the dynamics. 
 %       Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then x(k), y(k)
-%       should be measurements correponding to consecutive states z(k-1) and z(k).
+%       should be measurements corresponding to consecutive states z(k-1) and z(k).
 %       We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively 
-%       by efficient rank-2 updating window DMD algrithm.
+%       by efficient rank-2 updating window DMD algorithm.
 %        
 % Usage:
 %       wdmd = WindowDMD(n,w)
