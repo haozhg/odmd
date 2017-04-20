@@ -27,12 +27,9 @@ Download online DMD and window DMD implementation from github
 `git clone https://github.com/haozhg/odmd.git`
 
 ## Implementation
-1.**OnlineDMD.m** implements **OnlineDMD** class in Matlab.
-
-2.**WindomDMD.m** implements **WindowDMD** class in Matlab.
-
-3.**online.py** implements **OnlineDMD** class in Python.
-
+1.**OnlineDMD.m** implements **OnlineDMD** class in Matlab.  
+2.**WindomDMD.m** implements **WindowDMD** class in Matlab.  
+3.**online.py** implements **OnlineDMD** class in Python.  
 4.**window.py** implements **WindowDMD** class in Python.
 
 ## Documentation
