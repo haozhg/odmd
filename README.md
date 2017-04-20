@@ -23,24 +23,24 @@ Download online DMD and window DMD implementation from github
 `git clone https://github.com/haozhg/odmd.git`
 
 ## Implementation
-1.**OnlineDMD.m** implements **OnlineDMD** class in Matlab
-2.**WindomDMD.m** implements **WindowDMD** class in Matlab
-3.**online.py** implements **OnlineDMD** class in Python
-4.**window.py** implements **WindowDMD** class in Python
+1.**OnlineDMD.m** implements **OnlineDMD** class in Matlab.
+2.**WindomDMD.m** implements **WindowDMD** class in Matlab.
+3.**online.py** implements **OnlineDMD** class in Python.
+4.**window.py** implements **WindowDMD** class in Python.
 
 ## Documentation
 Matlab: 
-type help OnlineDMD for **OnlineDMD** class documentation
-type help WindowDMD for **WindowDMD** class documentation
+type **help OnlineDMD** for **OnlineDMD** class documentation.
+type **help WindowDMD** for **WindowDMD** class documentation.
 Python: 
-type help(online.OnlineDMD) for **OnlineDMD** class documentation
-type Help(window.WindowDMD) for **WindowDMD** class documentation
+type **help(online.OnlineDMD)** for **OnlineDMD** class documentation.
+type **help(window.WindowDMD)** for **WindowDMD** class documentation.
 
 ## Demos
-1.**online_demo.m** demos the use of Matlab **OnlineDMD** class
-2.**window_demo.m** demos the use of Matlab **WindowDMD** class
-3.**online_demo.py** demos the use of Python **OnlineDMD** class
-4.**window_demo.py** demos the use of Python **WindowDMD** class
+1.**online_demo.m** demos the use of Matlab **OnlineDMD** class.
+2.**window_demo.m** demos the use of Matlab **WindowDMD** class.
+3.**online_demo.py** demos the use of Python **OnlineDMD** class.
+4.**window_demo.py** demos the use of Python **WindowDMD** class.
 
 ## Authors:
 Hao Zhang, Princeton University
