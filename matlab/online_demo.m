@@ -32,12 +32,13 @@ x0 = [1;0];
 % interpolate uniform time step
 dt = 1e-1;
 time = 0:dt:max(tspan);
-xq = interp1(t,x,time);
-x = xq'; t = time;
+xq = interp1(t,x,time); xq = xq';
+% extract snapshot pairs
+x = xq(:,1:end-1); y = xq(:,2:end); t = time(2:end);
 % true dynamics, eigenvalues
 [n, m] = size(x);
-A = zeros(2,2,m);
-evals = zeros(2,m);
+A = zeros(n,n,m);
+evals = zeros(n,m);
 for k = 1:m
     A(:,:,k) = [0, 1+epsilon*t(k); -(1+epsilon*t(k)),0]; % continuous time dynamics
     evals(:,k) = eig(A(:,:,k)); % analytical continuous time eigenvalues
@@ -46,7 +47,7 @@ end
 
 % visualize snapshots
 figure, hold on
-plot(t,x(1,:),'x-',t,x(2,:),'o-','LineWidth',2)
+plot(time,xq(1,:),'x-',time,xq(2,:),'o-','LineWidth',2)
 xlabel('Time','Interpreter','latex')
 title('Snapshots','Interpreter','latex')
 fl = legend('$x_1(t)$','$x_2(t)$');
@@ -57,11 +58,11 @@ set(gca,'FontSize',20,'LineWidth',2)
 
 % batch DMD
 q = 20;
-AbatchDMD = zeros(2,2,m);
-evalsbatchDMD = zeros(2,m);
+AbatchDMD = zeros(n,n,m);
+evalsbatchDMD = zeros(n,m);
 tic
 for k = q+1:m
-    AbatchDMD(:,:,k) = x(:,2:k)*pinv(x(:,1:k-1));
+    AbatchDMD(:,:,k) = y(:,1:k)*pinv(x(:,1:k));
     evalsbatchDMD(:,k) = log(eig(AbatchDMD(:,:,k)))/dt;
 end
 elapsed_time = toc;
@@ -69,14 +70,14 @@ fprintf('Batch DMD, elapsed time: %f seconds\n', elapsed_time)
 
 % Online DMD lambda = 1
 q = 20;
-evalsonlineDMD1 = zeros(2,m);
+evalsonlineDMD1 = zeros(n,m);
 % creat object and initialize with first q snapshot pairs
-odmd = OnlineDMD(2,1);
-odmd.initialize(x(:,1:q-1),x(:,2:q));
+odmd = OnlineDMD(n,1);
+odmd.initialize(x(:,1:q),y(:,1:q));
 % online DMD
 tic
 for k = q+1:m
-    odmd.update(x(:,k-1),x(:,k));
+    odmd.update(x(:,k),y(:,k));
     evalsonlineDMD1(:,k) = log(eig(odmd.A))/dt;
 end
 elapsed_time = toc;
@@ -84,14 +85,14 @@ fprintf('Online DMD, lambda = 1, elapsed time: %f seconds\n', elapsed_time)
 
 % Online DMD, lambda = 0.9
 q = 20;
-evalsonlineDMD09 = zeros(2,m);
+evalsonlineDMD09 = zeros(n,m);
 % creat object and initialize with first q snapshot pairs
-odmd = OnlineDMD(2,0.9);
-odmd.initialize(x(:,1:q-1),x(:,2:q));
+odmd = OnlineDMD(n,0.9);
+odmd.initialize(x(:,1:q),y(:,1:q));
 % online DMD
 tic
 for k = q+1:m
-    odmd.update(x(:,k-1),x(:,k));
+    odmd.update(x(:,k),y(:,k));
     evalsonlineDMD09(:,k) = log(eig(odmd.A))/dt;
 end
 elapsed_time = toc;
@@ -100,12 +101,12 @@ fprintf('Online DMD, lambda = 0.9, elapsed time: %f seconds\n', elapsed_time)
 
 % visualize imaginary part of the continous time eigenvalues
 % from true, batch, online (lambda=1), and online (lambda=0.9)
-index = q+1:length(t); tq = t(index);
+updateindex = q+1:m;
 figure, hold on
 plot(t,imag(evals(1,:)),'k-','LineWidth',3)
-plot(tq,imag(evalsbatchDMD(1,index)),'-','LineWidth',3)
-plot(tq,imag(evalsonlineDMD1(1,index)),'--','LineWidth',3)
-plot(tq,imag(evalsonlineDMD09(1,index)),'-','LineWidth',3)
+plot(t(updateindex),imag(evalsbatchDMD(1,updateindex)),'-','LineWidth',3)
+plot(t(updateindex),imag(evalsonlineDMD1(1,updateindex)),'--','LineWidth',3)
+plot(t(updateindex),imag(evalsonlineDMD09(1,updateindex)),'-','LineWidth',3)
 xlabel('Time','Interpreter','latex'), ylabel('Im')
 title('Imaginary part of eigenvalues','Interpreter','latex')
 fl = legend('True','batch','online, $\lambda=1$','online, $\lambda=0.9$');

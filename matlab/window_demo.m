@@ -32,12 +32,13 @@ x0 = [1;0];
 % interpolate uniform time step
 dt = 1e-1;
 time = 0:dt:max(tspan);
-xq = interp1(t,x,time);
-x = xq'; t = time;
+xq = interp1(t,x,time); xq = xq';
+% extract snapshot pairs
+x = xq(:,1:end-1); y = xq(:,2:end); t = time(2:end);
 % true dynamics, eigenvalues
 [n, m] = size(x);
-A = zeros(2,2,m);
-evals = zeros(2,m);
+A = zeros(n,n,m);
+evals = zeros(n,m);
 for k = 1:m
     A(:,:,k) = [0, 1+epsilon*t(k); -(1+epsilon*t(k)),0]; % continuous time dynamics
     evals(:,k) = eig(A(:,:,k)); % analytical continuous time eigenvalues
@@ -46,7 +47,7 @@ end
 
 % visualize snapshots
 figure, hold on
-plot(t,x(1,:),'x-',t,x(2,:),'o-','LineWidth',2)
+plot(time,xq(1,:),'x-',time,xq(2,:),'o-','LineWidth',2)
 xlabel('Time','Interpreter','latex')
 title('Snapshots','Interpreter','latex')
 fl = legend('$x_1(t)$','$x_2(t)$');
@@ -57,12 +58,12 @@ set(gca,'FontSize',20,'LineWidth',2)
 
 % mini-batch DMD
 w = 20; % storage time window size, store recent w snapshot pairs
-AminibatchDMD = zeros(2,2,m);
-evalsminibatchDMD = zeros(2,m);
+AminibatchDMD = zeros(n,n,m);
+evalsminibatchDMD = zeros(n,m);
 % mini-batch DMD
 tic
 for k = w+1:m
-    AminibatchDMD(:,:,k) = x(:,k-w+1:k)*pinv(x(:,k-w:k-1));
+    AminibatchDMD(:,:,k) = y(:,k-w+1:k)*pinv(x(:,k-w+1:k));
     evalsminibatchDMD(:,k) = log(eig(AminibatchDMD(:,:,k)))/dt;
 end
 elapsed_time = toc;
@@ -70,16 +71,15 @@ fprintf('Mini-batch DMD, elapsed time: %f seconds\n', elapsed_time)
 
 
 % window DMD
-q = 20;
-w = q;
-evalswindowDMD = zeros(2,m);
-% creat object and initialize with first q snapshot pairs
-wdmd = WindowDMD(2,w);
-wdmd.initialize(x(:,1:q), x(:,2:q+1));
+w = 20;
+evalswindowDMD = zeros(n,m);
+% creat object and initialize with first w snapshot pairs
+wdmd = WindowDMD(n,w);
+wdmd.initialize(x(:,1:w), y(:,1:w));
 % window DMD
 tic
-for k = q+1:m
-    wdmd.update(x(:,k-q), x(:,k-q+1), x(:,k-1), x(:,k));
+for k = w+1:m
+    wdmd.update(x(:,k-w+1), y(:,k-w+1), x(:,k), y(:,k));
     evalswindowDMD(:,k) = log(eig(wdmd.A))/dt;
 end
 elapsed_time = toc;
@@ -88,11 +88,11 @@ fprintf('Window DMD, elapsed time: %f seconds\n', elapsed_time)
 
 % visualize imaginary part of the continous time eigenvalues
 % from true, mini-batch, and window
-index = q+1:length(t); tq = t(index);
+updateindex = w+1:m;
 figure, hold on
 plot(t,imag(evals(1,:)),'k-','LineWidth',3)
-plot(tq,imag(evalsminibatchDMD(1,index)),'-','LineWidth',3)
-plot(tq,imag(evalswindowDMD(1,index)),'--','LineWidth',3)
+plot(t(updateindex),imag(evalsminibatchDMD(1,updateindex)),'-','LineWidth',3)
+plot(t(updateindex),imag(evalswindowDMD(1,updateindex)),'--','LineWidth',3)
 xlabel('Time','Interpreter','latex'), ylabel('Im')
 title('Imaginary part of eigenvalues','Interpreter','latex')
 fl = legend('True','mini-batch','window');
