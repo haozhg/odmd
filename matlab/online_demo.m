@@ -17,8 +17,9 @@
 % We compare the performance of online DMD (with lambda=1,0.9) with the brute-force batch DMD
 % approach in terms of tracking time varying eigenvalues, by comparison with the analytical solution
 % 
-% Authors: Hao Zhang, Princeton University
-%          haozhang@princeton.edu
+% Authors: 
+%   Hao Zhang
+%   Clarence W. Rowley
 %     
 % Date created: April 2017
 

@@ -18,8 +18,9 @@ Window DMD computes the DMD matrix by using efficient rank-2 update idea
 We compare the performance of window DMD with the brute-force mini-batch DMD
 approach in terms of tracking time varying eigenvalues, by comparison with the analytical solution
     
-Authors: Hao Zhang, Princeton University
-         haozhang@princeton.edu
+Authors: 
+    Hao Zhang
+    Clarence W. Rowley
     
 Date created: April 2017
 """

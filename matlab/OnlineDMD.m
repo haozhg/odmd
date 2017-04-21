@@ -17,8 +17,6 @@
 %       odmd.initilizeghost()
 %       odmd.update(x,y)
 %       [evals, modes] = odmd.computemodes()
-%
-
 %        
 % properties:
 %       n: state dimension
@@ -36,9 +34,9 @@
 %                   correponding to consecutive states z(k-1) and z(k).
 %       computemodes(), compute and return DMD eigenvalues and DMD mdoes
 %
-% Authors:
-%   Hao Zhang, Princeton University
-%   haozhang@princeton.edu
+% Authors: 
+%   Hao Zhang
+%   Clarence W. Rowley
 % 
 % Created:
 %   April 2017.

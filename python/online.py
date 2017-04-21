@@ -3,25 +3,25 @@ import numpy as np
 
 class OnlineDMD:
     """OnlineDMD is a class that implements online dynamic mode decomposition
-    The time complexity (for one iteration) is O(n^2), and space complexity is
+    The time complexity (for one iteration) is O(n^2), and space complexity is 
     O(n^2), where n is the state dimension.
-
+    
     Algorithm description:
         At time step k, define two matrix Xk = [x(1),x(2),...,x(k)], Yk = [y(1),y(2),...,y(k)],
-        that contain all the past snapshot pairs, where x(k), y(k) are the n
-        dimensional state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics.
+        that contain all the past snapshot pairs, where x(k), y(k) are the n 
+        dimensional state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics. 
         Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then x(k), y(k)
         should be measurements correponding to consecutive states z(k-1) and z(k).
-        We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively
+        We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively 
         by efficient rank-1 updating online DMD algrithm.
-
+    
     Usage:
         odmd = OnlineDMD(n,forgetting)
         odmd.initialize(Xq,Yq)
         odmd.initilizeghost()
         odmd.update(x,y)
         evals, modes = odmd.computemodes()
-
+            
     properties:
         n: state dimension
         forgetting: forgetting factor between (0,1]
@@ -34,13 +34,15 @@ class OnlineDMD:
         initializeghost(), initialize online DMD algorithm with epsilon small (1e-15) ghost snapshot pairs before t=0
         update(x,y), update DMD computation when new snapshot pair (x,y) becomes available
         computemodes(), compute and return DMD eigenvalues and DMD modes
-
-    Authors: Hao Zhang, Princeton University
-             haozhang@princeton.edu
-
+    
+    Authors: 
+        Hao Zhang
+        Clarence W. Rowley
+    
     Date created: April 2017
-
-    To look up this documentation, type help(OnlineDMD) or OnlineDMD?
+    
+    To import the OnlineDMD class, add import online at head of Python scripts.
+    To look up this documentation, type help(online.OnlineDMD) or online.OnlineDMD?
     """
     def __init__(self, n=0, forgetting=1, timestep=0, A=None, P=None):
         """
@@ -72,7 +74,7 @@ class OnlineDMD:
             self.A = Yqhat.dot(np.linalg.pinv(Xqhat))
             self.P = np.linalg.inv(Xqhat.dot(Xqhat.T))/self.forgetting
             self.timestep += q
-
+            
     def initializeghost(self):
         """Initialize online DMD with epsilon small (1e-15) ghost snapshot pairs before t=0
         Usage: odmd.initilizeghost()
@@ -81,7 +83,7 @@ class OnlineDMD:
         alpha = 1.0/epsilon
         self.A = np.random.randn(self.n, self.n)
         self.P = alpha*np.identity(self.n)
-
+        
     def update(self, x, y):
         """Update the DMD computation with a new pair of snapshots (x,y)
         Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then (x,y)

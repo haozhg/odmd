@@ -32,9 +32,9 @@
 %       update(xold, yold, xnew, ynew), update when new snapshot pair becomes available
 %       computemodes(), compute and return DMD eigenvalues and DMD mdoes
 %
-% Authors:
-%   Hao Zhang, Princeton University
-%   haozhang@princeton.edu
+% Authors: 
+%   Hao Zhang
+%   Clarence W. Rowley
 % 
 % Created:
 %   April 2017.
@@ -79,14 +79,15 @@ classdef WindowDMD < handle
         end
         
         function update(obj, xold, yold, xnew, ynew)
-           % Update the DMD computation by sliding the finite time window forward
-           % Forget the oldest pair of snapshots (xold, yold), and includes the newest 
-           % pair of snapshots (xnew, ynew) in the new time window. If the new finite 
-           % time window at time step k+1 includes recent w snapshot pairs as
-           % Xw = [x(k-w+2),x(k-w+3),...,x(k+1)], Yw = [y(k-w+2),y(k-w+3),...,y(k+1)], 
-           % where y(k) = f(x(k)) and f is the dynamics, then we should take
-           % xold = x(k-w+2), yold = y(k-w+2), xnew = x(k+1), ynew = y(k+1)
-           % Usage: wdmd.update(xold, yold, xnew, ynew)
+            
+            % Update the DMD computation by sliding the finite time window forward
+            % Forget the oldest pair of snapshots (xold, yold), and includes the newest
+            % pair of snapshots (xnew, ynew) in the new time window. If the new finite
+            % time window at time step k+1 includes recent w snapshot pairs as
+            % Xw = [x(k-w+2),x(k-w+3),...,x(k+1)], Yw = [y(k-w+2),y(k-w+3),...,y(k+1)],
+            % where y(k) = f(x(k)) and f is the dynamics, then we should take
+            % xold = x(k-w+2), yold = y(k-w+2), xnew = x(k+1), ynew = y(k+1)
+            % Usage: wdmd.update(xold, yold, xnew, ynew)
             
             % Compute gamma
             gamma = 1/(1+xnew'*(obj.M*xnew));

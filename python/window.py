@@ -36,12 +36,14 @@ class WindowDMD:
         update(x,y), update DMD computation when new snapshot pair (x,y) becomes available
         computemodes(), compute and return DMD eigenvalues and DMD modes
         
-    Authors: Hao Zhang, Princeton University
-             haozhang@princeton.edu
+    Authors: 
+        Hao Zhang
+        Clarence W. Rowley
     
     Date created: April 2017
     
-    To look up this documentation, type help(WindowDMD) or WindowDMD?
+    To import the WindowDMD class, add import window at head of Python scripts.
+    To look up this documentation, type help(window.WindowDMD) or window.WindowDMD?
     """
     def __init__(self, n=0, windowsize=0, timestep=0, A=None, B=None, M=None):
         """
