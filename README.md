@@ -47,8 +47,8 @@ type **help(window.WindowDMD)** for **WindowDMD** class documentation.
 4.**window_demo.py** demos the use of Python **WindowDMD** class.
 
 ## Authors:
-Hao Zhang, Princeton University  
-haozhang@princeton.edu
+Hao Zhang  
+Clarence W. Rowley
 
 ## Date created:
 April 2017
