@@ -68,10 +68,9 @@ class WindowDMD:
         """
         q = len(Xq[0,:])
         if self.timestep == 0 and self.windowsize == q and self.windowsize >= self.n + 1:
-            Xqhat, Yqhat = Xq[:,:q-1], Yq[:,:q-1]
             self.A = Yq.dot(np.linalg.pinv(Xq))
-            self.B = Yqhat.dot(np.linalg.pinv(Xqhat))
-            self.M = np.linalg.inv(Xqhat.dot(Xqhat.T))
+            self.B = Yq[:,:q-1].dot(np.linalg.pinv(Xq[:,:q-1]))
+            self.M = np.linalg.inv(Xq[:,:q-1].dot(Xq[:,:q-1].T))
             self.timestep += q
         
     def update(self, xold, yold, xnew, ynew):
