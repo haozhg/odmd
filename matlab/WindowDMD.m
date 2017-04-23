@@ -69,11 +69,9 @@ classdef WindowDMD < handle
             % Usage: wdmd.initialize(Xq,Yq)
             q = length(Xq(1,:));
             if(obj.timestep == 0 && obj.w == q && obj.w >= obj.n+1)
-                Xqhat = Xq(:,1:q-1);
-                Yqhat = Yq(:,1:q-1);
                 obj.A = Yq*pinv(Xq);
-                obj.B = Yqhat*pinv(Xqhat);
-                obj.M = inv(Xqhat*Xqhat');
+                obj.B = Yq(:,1:q-1)*pinv(Xq(:,1:q-1));
+                obj.M = inv(Xq(:,1:q-1)*Xq(:,1:q-1)');
             end
             obj.timestep = obj.timestep + q;
         end
