@@ -35,9 +35,14 @@ class OnlineDMD:
         update(x,y), update DMD computation when new snapshot pair (x,y) becomes available
         computemodes(), compute and return DMD eigenvalues and DMD modes
     
-    Authors: 
+    Authors:
         Hao Zhang
         Clarence W. Rowley
+        
+    References:
+        Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
+        ``Fast Quadratic Time Methods for Online Dynamic Mode Decomposition", 
+        in production, 2017. To be submitted for publication, available on arXiv.
     
     Date created: April 2017
     

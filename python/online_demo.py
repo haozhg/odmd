@@ -21,7 +21,12 @@ approach in terms of tracking time varying eigenvalues, by comparison with the a
 Authors: 
     Hao Zhang
     Clarence W. Rowley
-    
+
+References:
+    Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
+    ``Fast Quadratic Time Methods for Online Dynamic Mode Decomposition", 
+    in production, 2017. To be submitted for publication, available on arXiv.
+            
 Date created: April 2017
 """
 
@@ -29,7 +34,7 @@ Date created: April 2017
 import sys
 sys.path.append('..')
 
-from online import OnlineDMD
+import dmdtools
 import numpy as np
 from scipy.integrate import odeint
 import time
@@ -87,7 +92,7 @@ print "Batch DMD, time = " + str(end-start) + " secs"
 # Online DMD, forgetting = 1
 q = 20
 evalsonlineDMD1 = np.empty((n,m),dtype=complex)
-odmd = OnlineDMD(n,1.0)
+odmd = dmdtools.OnlineDMD(n,1.0)
 odmd.initialize(x[:,:q],y[:,:q])
 start = time.clock()
 for k in range(q,m):
@@ -100,7 +105,7 @@ print "Online DMD, forgetting = 1, time = " + str(end-start) + " secs"
 # Online DMD, forgetting = 0.9
 q = 20
 evalsonlineDMD09 = np.empty((n,m),dtype=complex)
-odmd = OnlineDMD(n,0.9)
+odmd = dmdtools.OnlineDMD(n,0.9)
 odmd.initialize(x[:,:q],y[:,:q])
 start = time.clock()
 for k in range(q,m):
