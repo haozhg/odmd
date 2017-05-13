@@ -50,6 +50,11 @@ type **help(window.WindowDMD)** for **WindowDMD** class documentation.
 Hao Zhang  
 Clarence W. Rowley
 
+## Reference:
+Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
+``Fast Quadratic Time Methods for Online Dynamic Mode Decomposition", 
+in production, 2017. To be submitted for publication, available on arXiv.
+
 ## Date created:
 April 2017
 
