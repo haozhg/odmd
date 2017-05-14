@@ -34,7 +34,7 @@ Date created: April 2017
 import sys
 sys.path.append('..')
 
-import dmdtools
+from window import WindowDMD
 import numpy as np
 from scipy.integrate import odeint
 import time
@@ -92,7 +92,7 @@ print "Mini-batch DMD, time = " + str(end-start) + " secs"
 # Window DMD, w = 20
 w = 20
 evalswindowDMD = np.empty((n,m),dtype=complex)
-wdmd = dmdtools.WindowDMD(n,w)
+wdmd = WindowDMD(n,w)
 wdmd.initialize(x[:,:w],y[:,:w])
 start = time.clock()
 for k in range(w,m):
@@ -107,8 +107,8 @@ plt.figure()
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.plot(t, np.imag(evals[0,:]), 'k-',label='true',linewidth=2.0)
-plt.plot(t[w:], np.imag(evalsminibatchDMD[0,w:]), 'r-',label='mini-batch, w=20',linewidth=2.0)
-plt.plot(t[w:], np.imag(evalswindowDMD[0,w:]), 'g--',label='window, w=20',linewidth=2.0)
+plt.plot(t[w:], np.imag(evalsminibatchDMD[0,w:]), 'r-',label='mini-batch, $w=20$',linewidth=2.0)
+plt.plot(t[w:], np.imag(evalswindowDMD[0,w:]), 'g--',label='window, $w=20$',linewidth=2.0)
 plt.tick_params(labelsize=20)
 plt.xlabel('Time', fontsize=20)
 plt.ylabel('Im', fontsize=20)

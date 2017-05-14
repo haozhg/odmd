@@ -34,7 +34,7 @@ Date created: April 2017
 import sys
 sys.path.append('..')
 
-import dmdtools
+from online import OnlineDMD
 import numpy as np
 from scipy.integrate import odeint
 import time
@@ -92,7 +92,7 @@ print "Batch DMD, time = " + str(end-start) + " secs"
 # Online DMD, forgetting = 1
 q = 20
 evalsonlineDMD1 = np.empty((n,m),dtype=complex)
-odmd = dmdtools.OnlineDMD(n,1.0)
+odmd = OnlineDMD(n,1.0)
 odmd.initialize(x[:,:q],y[:,:q])
 start = time.clock()
 for k in range(q,m):
@@ -105,7 +105,7 @@ print "Online DMD, forgetting = 1, time = " + str(end-start) + " secs"
 # Online DMD, forgetting = 0.9
 q = 20
 evalsonlineDMD09 = np.empty((n,m),dtype=complex)
-odmd = dmdtools.OnlineDMD(n,0.9)
+odmd = OnlineDMD(n,0.9)
 odmd.initialize(x[:,:q],y[:,:q])
 start = time.clock()
 for k in range(q,m):
