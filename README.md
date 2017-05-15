@@ -3,8 +3,8 @@ Python/Matlab implementation of online dynamic mode decomposition (Online DMD) a
 
 ## Online DMD algorithm description
 At time step k, define two matrix Xk = [x(1),x(2),...,x(k)], Yk = [y(1),y(2),...,y(k)],
-that contain all the past snapshot pairs, where x(k), y(k) are the n dimensional state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics. A exponential weighting factor \lambda that places more weight on recent data can be incoorporated into the definition of Xk and Yk such that
-Xk = [lambda^(k-1)*x(1),lambda^(k-2)*x(2),…,lambda^1*x(k-1),x(k)], Yk = [lambda^(k-1)*y(1),lambda^(k-2)*y(2),…,lambda^1*y(k-1),y(k)].
+that contain all the past snapshot pairs, where x(k), y(k) are the n dimensional state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics. An exponential weighting factor \lambda that places more weight on recent data can be incoorporated into the definition of Xk and Yk such that
+Xk = [lambda^(k-1)*x(1),lambda^(k-2)*x(2),...,lambda^1*x(k-1),x(k)], Yk = [lambda^(k-1)*y(1),lambda^(k-2)*y(2),...,lambda^1*y(k-1),y(k)].
 
 Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then x(k), y(k) should be measurements corresponding to consecutive states z(k-1) and z(k). 
 We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively by efficient rank-1 updating online DMD algorithm. 
