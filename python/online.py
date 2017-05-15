@@ -41,7 +41,7 @@ class OnlineDMD:
         
     References:
         Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
-        ``Fast Quadratic-time Methods for Online Dynamic Mode Decomposition", 
+        ``Online Dynamic Mode Decomposition for Time-varying Systems",  
         in production, 2017. To be submitted for publication, available on arXiv.
     
     Date created: April 2017
