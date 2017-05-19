@@ -15,8 +15,9 @@ Batch DMD computes DMD matrix by brute-force taking the pseudo-inverse directly
 
 Online DMD computes the DMD matrix by using efficient rank-1 update idea
 
-We compare the performance of online DMD (with lambda=1,0.9) with the brute-force batch DMD
+We compare the performance of online DMD (with weighting=1,0.9) with the brute-force batch DMD
 approach in terms of tracking time varying eigenvalues, by comparison with the analytical solution
+Online DMD (weighting=1) and batch DMD should agree with each other (up to machine round-offer errors)
 
 Authors: 
     Hao Zhang
@@ -25,7 +26,7 @@ Authors:
 References:
     Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
     ``Online Dynamic Mode Decomposition for Time-varying Systems",  
-    in production, 2017. To be submitted for publication, available on arXiv.
+    in production, 2017. Available on arXiv.
             
 Date created: April 2017
 """
@@ -83,13 +84,13 @@ AbatchDMD = np.empty((n,n,m))
 evalsbatchDMD = np.empty((n,m),dtype=complex)
 start = time.clock()
 for k in range(q,m):
-    AbatchDMD[:,:,k] = y[:,:k].dot(np.linalg.pinv(x[:,:k]))
+    AbatchDMD[:,:,k] = y[:,:k+1].dot(np.linalg.pinv(x[:,:k+1]))
     evalsbatchDMD[:,k] = np.log(np.linalg.eigvals(AbatchDMD[:,:,k]))/dt
 end = time.clock()
 print "Batch DMD, time = " + str(end-start) + " secs"
 
 
-# Online DMD, forgetting = 1
+# Online DMD, weighting = 1
 q = 20
 evalsonlineDMD1 = np.empty((n,m),dtype=complex)
 odmd = OnlineDMD(n,1.0)
@@ -99,10 +100,10 @@ for k in range(q,m):
     odmd.update(x[:,k],y[:,k])
     evalsonlineDMD1[:,k] = np.log(np.linalg.eigvals(odmd.A))/dt
 end = time.clock()
-print "Online DMD, forgetting = 1, time = " + str(end-start) + " secs"
+print "Online DMD, weighting = 1, time = " + str(end-start) + " secs"
 
 
-# Online DMD, forgetting = 0.9
+# Online DMD, weighting = 0.9
 q = 20
 evalsonlineDMD09 = np.empty((n,m),dtype=complex)
 odmd = OnlineDMD(n,0.9)
@@ -112,21 +113,20 @@ for k in range(q,m):
     odmd.update(x[:,k],y[:,k])
     evalsonlineDMD09[:,k] = np.log(np.linalg.eigvals(odmd.A))/dt
 end = time.clock()
-print "Online DMD, forgetting = 0.9, time = " + str(end-start) + " secs"
+print "Online DMD, weighting = 0.9, time = " + str(end-start) + " secs"
 
 
-# visualize true, batch, online (forgettting=1,0.9)
+# visualize true, batch, online (weighting=1,0.9)
 plt.figure()
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-plt.plot(t, np.imag(evals[0,:]), 'k-',label='true',linewidth=2.0)
-plt.plot(t[q:], np.imag(evalsbatchDMD[0,q:]), 'r-',label='batch',linewidth=2.0)
-plt.plot(t[q:], np.imag(evalsonlineDMD1[0,q:]), 'g--',label='online, $\lambda$=1',linewidth=2.0)
-plt.plot(t[q:], np.imag(evalsonlineDMD09[0,q:]), 'b-',label='online, $\lambda$=0.9',linewidth=2.0)
+plt.plot(t, np.imag(evals[0,:]), 'k-',label='True',linewidth=2.0)
+plt.plot(t[q:], np.imag(evalsbatchDMD[0,q:]), 'r-',label='Batch',linewidth=2.0)
+plt.plot(t[q:], np.imag(evalsonlineDMD1[0,q:]), 'g--',label='Online, $wf=1$',linewidth=2.0)
+plt.plot(t[q:], np.imag(evalsonlineDMD09[0,q:]), 'b-',label='Online, $wf=0.9$',linewidth=2.0)
 plt.tick_params(labelsize=20)
 plt.xlabel('Time', fontsize=20)
-plt.ylabel('Im', fontsize=20)
-plt.title('Imignary part of eigenvalues', fontsize=20)
+plt.ylabel('Im($\lambda_{DMD}$)', fontsize=20)
 plt.legend(loc='best', fontsize=20, shadow=True)
 plt.xlim([0,10])
 plt.ylim([1,2])

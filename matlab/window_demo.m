@@ -7,7 +7,10 @@
 % 
 % At time step k, define two matrix Xk = [x(k-w+1),x(k-w+2),...,x(k)], Yk = [y(k-w+1),y(k-w+2),...,y(k)],
 % that contain the recent w snapshot pairs from a finite time window, 
-% we would like to compute Ak = Yk*pinv(Xk). This can be done by brute-force mini-batch DMD, 
+% we would like to compute Ak = Yk*pinv(Xk). 
+% At time step k+1, we need to forget old snapshot pair x(k-w+1), y(k-w+1), 
+% and remember new snapshot pair xnew = x(k+1), ynew = y(k+1)
+% This can be done by brute-force mini-batch DMD, 
 % and by efficient rank-2 updating window DMD algrithm.
 % 
 % Mini-batch DMD computes DMD matrix by taking the pseudo-inverse directly
@@ -16,7 +19,8 @@
 % 
 % We compare the performance of window DMD with the brute-force mini-batch DMD
 % approach in terms of tracking time varying eigenvalues, by comparison with the analytical solution
-%     
+% They should agree with each other (up to machine round-offer errors)
+% 
 % Authors: 
 %   Hao Zhang
 %   Clarence W. Rowley
@@ -24,7 +28,7 @@
 % Reference:
 % Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
 % ``Online Dynamic Mode Decomposition for Time-varying Systems", 
-% in production, 2017. To be submitted for publication, available on arXiv.
+% in production, 2017. Available on arXiv.
 % 
 % Date created: April 2017
 
@@ -77,7 +81,6 @@ fprintf('Mini-batch DMD, elapsed time: %f seconds\n', elapsed_time)
 
 
 % window DMD
-w = 20;
 evalswindowDMD = zeros(n,m);
 % creat object and initialize with first w snapshot pairs
 wdmd = WindowDMD(n,w);
@@ -85,7 +88,7 @@ wdmd.initialize(x(:,1:w), y(:,1:w));
 % window DMD
 tic
 for k = w+1:m
-    wdmd.update(x(:,k-w+1), y(:,k-w+1), x(:,k), y(:,k));
+    wdmd.update(x(:,k-w), y(:,k-w), x(:,k), y(:,k));
     evalswindowDMD(:,k) = log(eig(wdmd.A))/dt;
 end
 elapsed_time = toc;
@@ -96,13 +99,12 @@ fprintf('Window DMD, elapsed time: %f seconds\n', elapsed_time)
 % from true, mini-batch, and window
 updateindex = w+1:m;
 figure, hold on
-plot(t,imag(evals(1,:)),'k-','LineWidth',3)
-plot(t(updateindex),imag(evalsminibatchDMD(1,updateindex)),'-','LineWidth',3)
-plot(t(updateindex),imag(evalswindowDMD(1,updateindex)),'--','LineWidth',3)
-xlabel('Time','Interpreter','latex'), ylabel('Im')
-title('Imaginary part of eigenvalues','Interpreter','latex')
-fl = legend('True','mini-batch','window');
+plot(t,imag(evals(1,:)),'k-','LineWidth',2)
+plot(t(updateindex),imag(evalsminibatchDMD(1,updateindex)),'-','LineWidth',2)
+plot(t(updateindex),imag(evalswindowDMD(1,updateindex)),'--','LineWidth',2)
+xlabel('Time','Interpreter','latex'), ylabel('Im($\lambda_{DMD}$)','Interpreter','latex')
+fl = legend('True','Mini-batch, $w=20$','Window, $w=20$');
 set(fl,'Interpreter','latex','Location','northwest');
 ylim([1,2]), xlim([0,10])
 box on
-set(gca,'FontSize',18,'LineWidth',2)
+set(gca,'FontSize',20,'LineWidth',2)

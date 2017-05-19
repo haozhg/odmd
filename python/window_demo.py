@@ -9,7 +9,9 @@ are pure imaginary, i.e, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary uni
 At time step k, define two matrix Xk = [x(k-w+1),x(k-w+2),...,x(k)], Yk = [y(k-w+1),y(k-w+2),...,y(k)],
 that contain the recent w snapshot pairs from a finite time window, 
 we would like to compute Ak = Yk*pinv(Xk). This can be done by brute-force mini-batch DMD, 
-and by efficient rank-2 updating window DMD algrithm.
+and by efficient rank-2 updating window DMD algrithm. 
+For window DMD, at time k+1, we need to forget the old snapshot pair xold = x(k-w+1), yold = y(k-w+1), 
+and remember the new snapshot pair xnew = x(k+1), ynew = y(k+1)
 
 Mini-batch DMD computes DMD matrix by taking the pseudo-inverse directly
 
@@ -17,6 +19,7 @@ Window DMD computes the DMD matrix by using efficient rank-2 update idea
 
 We compare the performance of window DMD with the brute-force mini-batch DMD
 approach in terms of tracking time varying eigenvalues, by comparison with the analytical solution
+They should agree with each other (up to machine round-offer errors)
     
 Authors: 
     Hao Zhang
@@ -25,7 +28,7 @@ Authors:
 References:
     Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
     ``Online Dynamic Mode Decomposition for Time-varying Systems",  
-    in production, 2017. To be submitted for publication, available on arXiv.
+    in production, 2017. Available on arXiv.
         
 Date created: April 2017
 """
@@ -83,7 +86,7 @@ AminibatchDMD = np.empty((n,n,m))
 evalsminibatchDMD = np.empty((n,m),dtype=complex)
 start = time.clock()
 for k in range(w,m):
-    AminibatchDMD[:,:,k] = y[:,k-w:k].dot(np.linalg.pinv(x[:,k-w:k]))
+    AminibatchDMD[:,:,k] = y[:,k-w+1:k+1].dot(np.linalg.pinv(x[:,k-w+1:k+1]))
     evalsminibatchDMD[:,k] = np.log(np.linalg.eigvals(AminibatchDMD[:,:,k]))/dt
 end = time.clock()
 print "Mini-batch DMD, time = " + str(end-start) + " secs"
@@ -96,23 +99,22 @@ wdmd = WindowDMD(n,w)
 wdmd.initialize(x[:,:w],y[:,:w])
 start = time.clock()
 for k in range(w,m):
-    wdmd.update(x[:,k-w+1],y[:,k-w+1],x[:,k],y[:,k])
+    wdmd.update(x[:,k-w],y[:,k-w],x[:,k],y[:,k])
     evalswindowDMD[:,k] = np.log(np.linalg.eigvals(wdmd.A))/dt
 end = time.clock()
-print "Window DMD, forgetting = 1, time = " + str(end-start) + " secs"
+print "Window DMD, time = " + str(end-start) + " secs"
 
 
-# visualize true, batch, window (forgettting=1,0.9)
+# visualize true, batch, window
 plt.figure()
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-plt.plot(t, np.imag(evals[0,:]), 'k-',label='true',linewidth=2.0)
-plt.plot(t[w:], np.imag(evalsminibatchDMD[0,w:]), 'r-',label='mini-batch, $w=20$',linewidth=2.0)
-plt.plot(t[w:], np.imag(evalswindowDMD[0,w:]), 'g--',label='window, $w=20$',linewidth=2.0)
+plt.plot(t, np.imag(evals[0,:]), 'k-',label='True',linewidth=2.0)
+plt.plot(t[w:], np.imag(evalsminibatchDMD[0,w:]), 'r-',label='Mini-batch, $w=20$',linewidth=2.0)
+plt.plot(t[w:], np.imag(evalswindowDMD[0,w:]), 'g--',label='Window, $w=20$',linewidth=2.0)
 plt.tick_params(labelsize=20)
 plt.xlabel('Time', fontsize=20)
-plt.ylabel('Im', fontsize=20)
-plt.title('Imignary part of eigenvalues', fontsize=20)
+plt.ylabel('Im($\lambda_{DMD}$)', fontsize=20)
 plt.legend(loc='best', fontsize=20, shadow=True)
 plt.xlim([0,10])
 plt.ylim([1,2])
