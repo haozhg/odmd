@@ -10,7 +10,7 @@ At time step k, define two matrix X(k) = [x(k-w+1),x(k-w+2),...,x(k)], Y(k) = [y
 that contain the recent w snapshot pairs from a finite time window, 
 we would like to compute Ak = Yk*pinv(Xk). This can be done by brute-force mini-batch DMD, 
 and by efficient rank-2 updating window DMD algrithm. 
-For window DMD, at time k+1, we need to forget the old snapshot pair xold = x(k-w), yold = y(k-w), 
+For window DMD, at time k+1, we need to forget the old snapshot pair xold = x(k-w+1), yold = y(k-w+1), 
 and remember the new snapshot pair xnew = x(k+1), ynew = y(k+1)
 
 Mini-batch DMD computes DMD matrix by taking the pseudo-inverse directly

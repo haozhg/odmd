@@ -14,7 +14,7 @@ class WindowDMD:
         y(k) = f(x(k)) is the image of x(k), f() is the dynamics. 
         Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then x(k), y(k)
         should be measurements correponding to consecutive states z(k-1) and z(k).
-        At time k+1, we need to forget the old snapshot pair xold = x(k-w), yold = y(k-w), 
+        At time k+1, we need to forget the old snapshot pair xold = x(k-w+1), yold = y(k-w+1), 
         and remember the new snapshot pair xnew = x(k+1), ynew = y(k+1)
         We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively 
         by efficient rank-2 updating window DMD algrithm.
@@ -83,7 +83,7 @@ class WindowDMD:
         time window at time step k+1 includes recent w snapshot pairs as
         X(k+1) = [x(k-w+2),x(k-w+3),...,x(k+1)], Y(k+1) = [y(k-w+2),y(k-w+3),...,y(k+1)], 
         where y(k) = f(x(k)) and f() is the dynamics, then we should take
-        xold = x(k-w), yold = y(k-w), xnew = x(k+1), ynew = y(k+1)
+        xold = x(k-w+1), yold = y(k-w+1), xnew = x(k+1), ynew = y(k+1)
         Usage: wdmd.update(xold, yold, xnew, ynew)
         """
         # direct rank-2 update
