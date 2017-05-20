@@ -6,11 +6,11 @@ where x = [x1,x2]', A(t) = [0,w(t);-w(t),0],
 w(t)=1+epsilon*t, epsilon=0.1. The slowly time varying eigenvlaues of A(t)
 are pure imaginary, i.e, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary unit
 
-At time step k, define two matrix Xk = [x(k-w+1),x(k-w+2),...,x(k)], Yk = [y(k-w+1),y(k-w+2),...,y(k)],
+At time step k, define two matrix X(k) = [x(k-w+1),x(k-w+2),...,x(k)], Y(k) = [y(k-w+1),y(k-w+2),...,y(k)],
 that contain the recent w snapshot pairs from a finite time window, 
 we would like to compute Ak = Yk*pinv(Xk). This can be done by brute-force mini-batch DMD, 
 and by efficient rank-2 updating window DMD algrithm. 
-For window DMD, at time k+1, we need to forget the old snapshot pair xold = x(k-w+1), yold = y(k-w+1), 
+For window DMD, at time k+1, we need to forget the old snapshot pair xold = x(k-w), yold = y(k-w), 
 and remember the new snapshot pair xnew = x(k+1), ynew = y(k+1)
 
 Mini-batch DMD computes DMD matrix by taking the pseudo-inverse directly

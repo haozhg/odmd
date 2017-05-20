@@ -6,7 +6,7 @@ where x = [x1,x2]', A(t) = [0,w(t);-w(t),0],
 w(t)=1+epsilon*t, epsilon=0.1. The slowly time varying eigenvlaues of A(t)
 are pure imaginary, i.e, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary unit
 
-At time step k, define two matrix Xk = [x(1),x(2),...,x(k)], Yk = [y(1),y(2),...,y(k)],
+At time step k, define two matrix X(k) = [x(1),x(2),...,x(k)], Y(k) = [y(1),y(2),...,y(k)],
 that contain all the past snapshot pairs, we would like to compute 
 Ak = Yk*pinv(Xk). This can be done by brute-force batch DMD, 
 and by efficient rank-1 updating online DMD algrithm.

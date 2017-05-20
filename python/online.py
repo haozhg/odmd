@@ -7,7 +7,7 @@ class OnlineDMD:
     O(n^2), where n is the state dimension.
     
     Algorithm description:
-        At time step k, define two matrix Xk = [x(1),x(2),...,x(k)], Yk = [y(1),y(2),...,y(k)],
+        At time step k, define two matrix X(k) = [x(1),x(2),...,x(k)], Y(k) = [y(1),y(2),...,y(k)],
         that contain all the past snapshot pairs, where x(k), y(k) are the n 
         dimensional state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics. 
         Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then x(k), y(k)
