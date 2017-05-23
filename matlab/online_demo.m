@@ -87,7 +87,7 @@ elapsed_time = toc;
 fprintf('Online DMD, weighting = 1, elapsed time: %f seconds\n', elapsed_time)
 
 % Online DMD, weighting = 0.9
-evalsonlineDMD09 = zeros(n,m);
+evalsonlineDMD2 = zeros(n,m);
 % creat object and initialize with first q snapshot pairs
 odmd = OnlineDMD(n,0.9);
 odmd.initialize(x(:,1:q),y(:,1:q));
@@ -95,7 +95,7 @@ odmd.initialize(x(:,1:q),y(:,1:q));
 tic
 for k = q+1:m
     odmd.update(x(:,k),y(:,k));
-    evalsonlineDMD09(:,k) = log(eig(odmd.A))/dt;
+    evalsonlineDMD2(:,k) = log(eig(odmd.A))/dt;
 end
 elapsed_time = toc;
 fprintf('Online DMD, weighting = 0.9, elapsed time: %f seconds\n', elapsed_time)
@@ -108,7 +108,7 @@ figure, hold on
 plot(time,imag(evals(1,:)),'k-','LineWidth',2)
 plot(time(updateindex),imag(evalsbatchDMD(1,updateindex)),'-','LineWidth',2)
 plot(time(updateindex),imag(evalsonlineDMD1(1,updateindex)),'--','LineWidth',2)
-plot(time(updateindex),imag(evalsonlineDMD09(1,updateindex)),'-','LineWidth',2)
+plot(time(updateindex),imag(evalsonlineDMD2(1,updateindex)),'--','LineWidth',2)
 xlabel('Time','Interpreter','latex'), ylabel('Im($\lambda_{DMD}$)','Interpreter','latex')
 fl = legend('True','Batch','Online, $wf=1$','Online, $wf=0.9$');
 set(fl,'Interpreter','latex','Location','northwest');

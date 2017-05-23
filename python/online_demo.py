@@ -104,13 +104,13 @@ print "Online DMD, weighting = 1, time = " + str(end-start) + " secs"
 
 
 # Online DMD, weighting = 0.9
-evalsonlineDMD09 = np.empty((n,m),dtype=complex)
+evalsonlineDMD2 = np.empty((n,m),dtype=complex)
 odmd = OnlineDMD(n,0.9)
 odmd.initialize(x[:,:q],y[:,:q])
 start = time.clock()
 for k in range(q,m):
     odmd.update(x[:,k],y[:,k])
-    evalsonlineDMD09[:,k] = np.log(np.linalg.eigvals(odmd.A))/dt
+    evalsonlineDMD2[:,k] = np.log(np.linalg.eigvals(odmd.A))/dt
 end = time.clock()
 print "Online DMD, weighting = 0.9, time = " + str(end-start) + " secs"
 
@@ -122,7 +122,7 @@ plt.rc('font', family='serif')
 plt.plot(t, np.imag(evals[0,:]), 'k-',label='True',linewidth=2.0)
 plt.plot(t[q:], np.imag(evalsbatchDMD[0,q:]), 'r-',label='Batch',linewidth=2.0)
 plt.plot(t[q:], np.imag(evalsonlineDMD1[0,q:]), 'g--',label='Online, $wf=1$',linewidth=2.0)
-plt.plot(t[q:], np.imag(evalsonlineDMD09[0,q:]), 'b-',label='Online, $wf=0.9$',linewidth=2.0)
+plt.plot(t[q:], np.imag(evalsonlineDMD2[0,q:]), 'b--',label='Online, $wf=0.9$',linewidth=2.0)
 plt.tick_params(labelsize=20)
 plt.xlabel('Time', fontsize=20)
 plt.ylabel('Im($\lambda_{DMD}$)', fontsize=20)

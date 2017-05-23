@@ -74,7 +74,7 @@ classdef OnlineDMD < handle
             % Initialize OnlineDMD with q snapshot pairs stored in (Xq, Yq)
             % Usage: odmd.initialize(Xq,Yq)
             q = length(Xq(1,:));
-            if(obj.timestep == 0 && q>=obj.n)
+            if(obj.timestep == 0 && rank(Xq) == obj.n)
                 weight = (sqrt(obj.weighting)).^(q-1:-1:0);
                 Xq = Xq.*weight;
                 Yq = Yq.*weight;

@@ -90,19 +90,31 @@ for k in range(w,m):
     AminibatchDMD[:,:,k] = y[:,k-w+1:k+1].dot(np.linalg.pinv(x[:,k-w+1:k+1]))
     evalsminibatchDMD[:,k] = np.log(np.linalg.eigvals(AminibatchDMD[:,:,k]))/dt
 end = time.clock()
-print "Mini-batch DMD, time = " + str(end-start) + " secs"
+print "Mini-batch DMD, w = 10, time = " + str(end-start) + " secs"
 
 
-# Window DMD, w = 10
-evalswindowDMD = np.empty((n,m),dtype=complex)
-wdmd = WindowDMD(n,w)
+# Window DMD, w = 10, weighting = 1
+evalswindowDMD1 = np.empty((n,m),dtype=complex)
+wdmd = WindowDMD(n,w,1)
 wdmd.initialize(x[:,:w],y[:,:w])
 start = time.clock()
 for k in range(w,m):
     wdmd.update(x[:,k-w],y[:,k-w],x[:,k],y[:,k])
-    evalswindowDMD[:,k] = np.log(np.linalg.eigvals(wdmd.A))/dt
+    evalswindowDMD1[:,k] = np.log(np.linalg.eigvals(wdmd.A))/dt
 end = time.clock()
-print "Window DMD, time = " + str(end-start) + " secs"
+print "Window DMD, w=10, weighting = 1, time = " + str(end-start) + " secs"
+
+
+# Window DMD, w = 10, weighting = 0.5
+evalswindowDMD2 = np.empty((n,m),dtype=complex)
+wdmd = WindowDMD(n,w,0.5)
+wdmd.initialize(x[:,:w],y[:,:w])
+start = time.clock()
+for k in range(w,m):
+    wdmd.update(x[:,k-w],y[:,k-w],x[:,k],y[:,k])
+    evalswindowDMD2[:,k] = np.log(np.linalg.eigvals(wdmd.A))/dt
+end = time.clock()
+print "Window DMD, w=10, weighting = 0.5, time = " + str(end-start) + " secs"
 
 
 # visualize true, batch, window
@@ -111,7 +123,8 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.plot(t, np.imag(evals[0,:]), 'k-',label='True',linewidth=2.0)
 plt.plot(t[w:], np.imag(evalsminibatchDMD[0,w:]), 'r-',label='Mini-batch, $w=10$',linewidth=2.0)
-plt.plot(t[w:], np.imag(evalswindowDMD[0,w:]), 'g--',label='Window, $w=10$',linewidth=2.0)
+plt.plot(t[w:], np.imag(evalswindowDMD1[0,w:]), 'g--',label='Window, $w=10$, $wf=1$',linewidth=2.0)
+plt.plot(t[w:], np.imag(evalswindowDMD2[0,w:]), 'b--',label='Window, $w=10$, $wf=0.5$',linewidth=2.0)
 plt.tick_params(labelsize=20)
 plt.xlabel('Time', fontsize=20)
 plt.ylabel('Im($\lambda_{DMD}$)', fontsize=20)

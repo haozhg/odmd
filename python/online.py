@@ -70,7 +70,7 @@ class OnlineDMD:
         """
         q = len(Xq[0,:])
         Xqhat, Yqhat = np.zeros(Xq.shape), np.zeros(Yq.shape)
-        if self.timestep == 0 and self.n <= q:
+        if self.timestep == 0 and np.linalg.matrix_rank(Xq) == self.n:
             weight = np.sqrt(self.weighting)**range(q-1,-1,-1)
             Xqhat, Yqhat = weight*Xq, weight*Yq
             self.A = Yqhat.dot(np.linalg.pinv(Xqhat))

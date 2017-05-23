@@ -16,20 +16,21 @@
 %       by efficient rank-2 updating window DMD algorithm.
 %        
 % Usage:
-%       wdmd = WindowDMD(n,w)
-%       wdmd.initialize(Xq,Yq)
+%       wdmd = WindowDMD(n,w,weighting)
+%       wdmd.initialize(Xw,Yw)
 %       wdmd.update(xold, yold, xnew, ynew)
 %       [evals, modes] = wdmd.computemodes()
 %
 % properties:
 %       n: state dimension
 %       w: finite time window size
+%       weighting: weighting factor
 %       timestep: number of snapshot pairs processed
 %       A: DMD matrix for w snapshot pairs, size n by n
 %       P: Matrix that contains information about recent w snapshots, size n by n
 % 
 % methods:
-%       initialize(Xq, Yq), initialize window DMD algorithm
+%       initialize(Xw, Yw), initialize window DMD algorithm
 %       update(xold, yold, xnew, ynew), update by forgetting old snapshot pairs, 
 %       and remeber new snapshot pair
 %       At time k+1, if X(k+1) = [x(k-w+2),x(k-w+2),...,x(k+1)], Y(k+1) = [y(k-w+2),y(k-w+2),...,y(k+1)], 
@@ -53,31 +54,36 @@
 classdef WindowDMD < handle
     properties
         n = 0;              % state dimension
-        w = 0;              % weighting factor
+        w = 0;              % window size
+        weighting = 1;      % weighting factor
         timestep = 0;       % number of snapshots processed
         A;      % DMD matrix for w snapshot pairs, size n by n
         P;      % Matrix that contains information about recent w snapshots, size n by n
     end
     
     methods
-        function obj = WindowDMD(n,w)
+        function obj = WindowDMD(n, w, weighting)
             % Creat an object for window DMD
-            % Usage: wdmd = WindowDMD(n,w)
-            if nargin == 2
+            % Usage: wdmd = WindowDMD(n,w,weighting)
+            if nargin == 3
                 obj.n = n;
                 obj.w = w;
+                obj.weighting = weighting;
                 obj.A = zeros(n,n);
                 obj.P = zeros(n,n);
             end
         end
         
-        function initialize(obj, Xq, Yq)
-            % Initialize WnlineDMD with q snapshot pairs stored in (Xq, Yq)
-            % Usage: wdmd.initialize(Xq,Yq)
-            q = length(Xq(1,:));
-            if(obj.timestep == 0 && obj.w == q && obj.w >= obj.n+1)
-                obj.A = Yq*pinv(Xq);
-                obj.P = inv(Xq*Xq');
+        function initialize(obj, Xw, Yw)
+            % Initialize WnlineDMD with w snapshot pairs stored in (Xw, Yw)
+            % Usage: wdmd.initialize(Xw,Yw)
+            q = length(Xw(1,:));
+            if(obj.timestep == 0 && obj.w == q && rank(Xw) == obj.n)
+                weight = (sqrt(obj.weighting)).^(q-1:-1:0);
+                Xw = Xw.*weight;
+                Yw = Yw.*weight;
+                obj.A = Yw*pinv(Xw);
+                obj.P = inv(Xw*Xw')/obj.weighting;
             end
             obj.timestep = obj.timestep + q;
         end
@@ -95,17 +101,18 @@ classdef WindowDMD < handle
             
             % direct rank-2 update
             % define matrices
-            U = [xold, xnew]; V = [yold, ynew]; C = diag([-1,1]);
+            U = [xold, xnew]; V = [yold, ynew]; 
+            C = diag([-(obj.weighting)^(obj.w),1]);
             % compute PkU matrix vector product beforehand
             PkU = obj.P*U;
             % compute AkU matrix vector product beforehand
             AkU = obj.A*U;
             % compute Gamma
-            Gamma = inv(C+U'*PkU);
+            Gamma = inv(inv(C)+U'*PkU);
             % update A
             obj.A = obj.A + (V-AkU)*(Gamma*PkU');
             % update P
-            obj.P = obj.P - PkU*(Gamma*PkU');
+            obj.P = (obj.P - PkU*(Gamma*PkU'))/obj.weighting;
             % ensure P is SPD by taking its symmetric part
             obj.P = (obj.P+(obj.P)')/2;
             

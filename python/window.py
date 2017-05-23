@@ -21,20 +21,22 @@ class WindowDMD:
         
     Usage:  
         wdmd = WindowDMD(n,windowsize)
-        wdmd.initialize(Xq,Yq)
+        wdmd.initialize(Xw,Yw)
         wdmd.update(xold,yold,xnew,ynew)
         evals, modes = wdmd.computemodes()
             
     properties:
         n: state dimension
         windowsize: window size
+        weighting: weighting factor
         timestep: number of snapshot pairs processed (i.e., the current time step)
         A: DMD matrix, size n by n
         P: Matrix that contains information about recent w snapshots, size n by n
 
     methods:
-        initialize(Xq, Yq), initialize window DMD algorithm
-        update(x,y), update DMD computation when new snapshot pair (x,y) becomes available
+        initialize(Xw, Yw), initialize window DMD algorithm with w snapshot pairs
+        update(xold,yold,xnew,ynew), update DMD computation by forgetting old snapshot pair
+        and remember new snapshot pair
         computemodes(), compute and return DMD eigenvalues and DMD modes
         
     Authors:
@@ -51,13 +53,14 @@ class WindowDMD:
     To import the WindowDMD class, add import window at head of Python scripts.
     To look up this documentation, type help(window.WindowDMD) or window.WindowDMD?
     """
-    def __init__(self, n=0, windowsize=0, timestep=0, A=None, P=None):
+    def __init__(self, n=0, windowsize=0, weighting=1, timestep=0, A=None, P=None):
         """
         Creat an object for window DMD
-        Usage: wdmd = WindowDMD(n,windowsize)
+        Usage: wdmd = WindowDMD(n,windowsize,weighting)
             """
         self.n = n
         self.windowsize = windowsize
+        self.weighting = weighting
         self.timestep = timestep
         if A is None or P is None:
             self.A = np.zeros([n,n])
@@ -66,14 +69,16 @@ class WindowDMD:
             self.A = A
             self.P = P
 
-    def initialize(self, Xq, Yq):
-        """Initialize window DMD with first q snapshot pairs stored in (Xq, Yq)
-        Usage: wdmd.initialize(Xq,Yq)
+    def initialize(self, Xw, Yw):
+        """Initialize window DMD with first w snapshot pairs stored in (Xw, Yw)
+        Usage: wdmd.initialize(Xw,Yw)
         """
-        q = len(Xq[0,:])
-        if self.timestep == 0 and self.windowsize == q and self.windowsize >= self.n + 1:
-            self.A = Yq.dot(np.linalg.pinv(Xq))
-            self.P = np.linalg.inv(Xq.dot(Xq.T))
+        q = len(Xw[0,:])
+        if self.timestep == 0 and self.windowsize == q and np.linalg.matrix_rank(Xw) == self.n:
+            weight = np.sqrt(self.weighting)**range(q-1,-1,-1)
+            Xwhat, Ywhat = weight*Xw, weight*Yw
+            self.A = Ywhat.dot(np.linalg.pinv(Xwhat))
+            self.P = np.linalg.inv(Xwhat.dot(Xwhat.T))/self.weighting
             self.timestep += q
         
     def update(self, xold, yold, xnew, ynew):
@@ -89,17 +94,17 @@ class WindowDMD:
         # direct rank-2 update
         # define matrices
         U, V = np.column_stack((xold, xnew)), np.column_stack((yold, ynew))
-        C = np.diag([-1,1])
+        C = np.diag([-(self.weighting)**(self.windowsize),1])
         # compute PkU matrix vector product beforehand
         PkU = self.P.dot(U)
         # compute AkU matrix vector product beforehand
         AkU = self.A.dot(U)
         # compute Gamma
-        Gamma = np.linalg.inv(C+U.T.dot(PkU))
+        Gamma = np.linalg.inv(np.linalg.inv(C)+U.T.dot(PkU))
         # update A
         self.A += (V-AkU).dot(Gamma).dot(PkU.T)
         # update P
-        self.P += -PkU.dot(Gamma).dot(PkU.T)
+        self.P = (self.P - PkU.dot(Gamma).dot(PkU.T))/self.weighting
         # ensure P is SPD by taking its symmetric part
         self.P = (self.P + self.P.T)/2
         

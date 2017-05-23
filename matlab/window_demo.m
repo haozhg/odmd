@@ -75,23 +75,36 @@ for k = w+1:m
     evalsminibatchDMD(:,k) = log(eig(AminibatchDMD(:,:,k)))/dt;
 end
 elapsed_time = toc;
-fprintf('Mini-batch DMD, elapsed time: %f seconds\n', elapsed_time)
+fprintf('Mini-batch DMD, w=10, elapsed time: %f seconds\n', elapsed_time)
 
 
-% window DMD
-evalswindowDMD = zeros(n,m);
+% window DMD, weighting = 1
+evalswindowDMD1 = zeros(n,m);
 % creat object and initialize with first w snapshot pairs
-wdmd = WindowDMD(n,w);
+wdmd = WindowDMD(n,w,1);
 wdmd.initialize(x(:,1:w), y(:,1:w));
 % window DMD
 tic
 for k = w+1:m
     wdmd.update(x(:,k-w), y(:,k-w), x(:,k), y(:,k));
-    evalswindowDMD(:,k) = log(eig(wdmd.A))/dt;
+    evalswindowDMD1(:,k) = log(eig(wdmd.A))/dt;
 end
 elapsed_time = toc;
-fprintf('Window DMD, elapsed time: %f seconds\n', elapsed_time)
+fprintf('Window DMD, w = 10, weighting = 1, elapsed time: %f seconds\n', elapsed_time)
 
+% window DMD, weighting = 0.5
+evalswindowDMD2 = zeros(n,m);
+% creat object and initialize with first w snapshot pairs
+wdmd = WindowDMD(n,w,0.5);
+wdmd.initialize(x(:,1:w), y(:,1:w));
+% window DMD
+tic
+for k = w+1:m
+    wdmd.update(x(:,k-w), y(:,k-w), x(:,k), y(:,k));
+    evalswindowDMD2(:,k) = log(eig(wdmd.A))/dt;
+end
+elapsed_time = toc;
+fprintf('Window DMD, w = 10, weighting = 0.5, elapsed time: %f seconds\n', elapsed_time)
 
 % visualize imaginary part of the continous time eigenvalues
 % from true, mini-batch, and window
@@ -99,9 +112,10 @@ updateindex = w+1:m;
 figure, hold on
 plot(time,imag(evals(1,:)),'k-','LineWidth',2)
 plot(time(updateindex),imag(evalsminibatchDMD(1,updateindex)),'-','LineWidth',2)
-plot(time(updateindex),imag(evalswindowDMD(1,updateindex)),'--','LineWidth',2)
+plot(time(updateindex),imag(evalswindowDMD1(1,updateindex)),'--','LineWidth',2)
+plot(time(updateindex),imag(evalswindowDMD2(1,updateindex)),'--','LineWidth',2)
 xlabel('Time','Interpreter','latex'), ylabel('Im($\lambda_{DMD}$)','Interpreter','latex')
-fl = legend('True','Mini-batch, $w=10$','Window, $w=10$');
+fl = legend('True','Mini-batch, $w=10$','Window, $w=10$, $wf=1$','Window, $w=10$, $wf=0.5$');
 set(fl,'Interpreter','latex','Location','northwest');
 ylim([1,2]), xlim([0,10])
 box on
