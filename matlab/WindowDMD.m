@@ -95,7 +95,7 @@ classdef WindowDMD < handle
             
             % direct rank-2 update
             % define matrices
-            U = [xold, xnew]; V = [yold, ynew]; C = [-1,0;0,1];
+            U = [xold, xnew]; V = [yold, ynew]; C = diag([-1,1]);
             % compute PkU matrix vector product beforehand
             PkU = obj.P*U;
             % compute AkU matrix vector product beforehand
@@ -106,6 +106,8 @@ classdef WindowDMD < handle
             obj.A = obj.A + (V-AkU)*(Gamma*PkU');
             % update P
             obj.P = obj.P - PkU*(Gamma*PkU');
+            % ensure P is SPD by taking its symmetric part
+            obj.P = (obj.P+(obj.P)')/2;
             
             % time step + 1
             obj.timestep = obj.timestep + 1;

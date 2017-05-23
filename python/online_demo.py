@@ -53,8 +53,9 @@ tspan = np.linspace(0,10,101)
 dt = 0.1
 x0 = [1,0]
 xsol = odeint(dyn,x0,tspan).T
+# extract snapshots
 x, y = xsol[:,:-1], xsol[:,1:]
-t = tspan[:-1]
+t = tspan[1:]
 # true dynamics, true eigenvalues
 n, m = len(x[:,0]), len(x[0,:])
 A = np.empty((n,n,m))
@@ -79,7 +80,7 @@ plt.show()
 
 
 # batch DMD
-q = 20
+q = 10
 AbatchDMD = np.empty((n,n,m))
 evalsbatchDMD = np.empty((n,m),dtype=complex)
 start = time.clock()
@@ -91,7 +92,6 @@ print "Batch DMD, time = " + str(end-start) + " secs"
 
 
 # Online DMD, weighting = 1
-q = 20
 evalsonlineDMD1 = np.empty((n,m),dtype=complex)
 odmd = OnlineDMD(n,1.0)
 odmd.initialize(x[:,:q],y[:,:q])
@@ -104,7 +104,6 @@ print "Online DMD, weighting = 1, time = " + str(end-start) + " secs"
 
 
 # Online DMD, weighting = 0.9
-q = 20
 evalsonlineDMD09 = np.empty((n,m),dtype=complex)
 odmd = OnlineDMD(n,0.9)
 odmd.initialize(x[:,:q],y[:,:q])

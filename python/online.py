@@ -97,9 +97,11 @@ class OnlineDMD:
         # compute gamma
         gamma = 1.0/(1 + x.T.dot(Px))
         # update A
-        self.A += np.outer(y-self.A.dot(x),gamma*Px)
-        # update P
-        self.P = (self.P - np.outer(gamma*Px,Px))/self.weighting
+        self.A += np.outer(gamma*(y-self.A.dot(x)),Px)
+        # update P, group Px*Px' to ensure positive definite
+        self.P = (self.P - gamma*np.outer(Px,Px))/self.weighting
+        # ensure P is SPD by taking its symmetric part
+        self.P = (self.P + self.P.T)/2
         # time step + 1
         self.timestep += 1
 

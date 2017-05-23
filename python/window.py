@@ -82,7 +82,7 @@ class WindowDMD:
         pair of snapshots (xnew, ynew) in the new time window. If the new finite 
         time window at time step k+1 includes recent w snapshot pairs as
         X(k+1) = [x(k-w+2),x(k-w+3),...,x(k+1)], Y(k+1) = [y(k-w+2),y(k-w+3),...,y(k+1)], 
-        where y(k) = f(x(k)) and f() is the dynamics, then we should take
+        where y(k) = f(x(k)) and f is the dynamics, then we should take
         xold = x(k-w+1), yold = y(k-w+1), xnew = x(k+1), ynew = y(k+1)
         Usage: wdmd.update(xold, yold, xnew, ynew)
         """
@@ -100,6 +100,8 @@ class WindowDMD:
         self.A += (V-AkU).dot(Gamma).dot(PkU.T)
         # update P
         self.P += -PkU.dot(Gamma).dot(PkU.T)
+        # ensure P is SPD by taking its symmetric part
+        self.P = (self.P + self.P.T)/2
         
         # time step + 1
         self.timestep += 1
