@@ -1,5 +1,5 @@
 % WindowDMD is a class that implements window dynamic mode decomposition
-% The time complexity (multiply?add operation for one iteration) is O(n^2), and space complexity is 
+% The time complexity (multiply-add operation for one iteration) is O(n^2), and space complexity is 
 % O(wn+2n^2), where n is the state dimension, w is the window size.
 % 
 % Algorithm description:
