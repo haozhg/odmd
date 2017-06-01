@@ -8,8 +8,7 @@ An exponential weighting factor rho=sigma^2 (0<rho<=1) that places more weight o
 
 At time k+1, the matrices become X(k+1) = [x(1),x(2),…,x(k),x(k+1)], Y(k+1) = [y(1),y(2),…,y(k),y(k+1)]. We need to remember a new snapshot pair x(k+1), y(k+1). We can update the DMD matrix Ak = Yk*pinv(Xk) recursively by efficient rank-1 updating online DMD algorithm.  
 
-The time complexity (for one iteration) is O(n^2), and space complexity is 
-O(n^2), where n is the state dimension.  
+The time complexity (multiply–add operation for one iteration) is O(n^2), and space complexity is O(n^2), where n is the state dimension.  
 
 ## Window DMD algorithm description
 At time step k, define two matrix X(k) = [x(k-w+1),x(k-w+2),...,x(k)], Y(k) = [y(k-w+1),y(k-w+2),...,y(k)] that contain the recent w snapshot pairs from a finite time window, where x(k), y(k) are the n dimensional state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics. Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then x(k), y(k) should be measurements corresponding to consecutive states z(k-1) and z(k).  
@@ -18,8 +17,7 @@ An exponential weighting factor rho=sigma^2 (0<rho<=1) that places more weight o
 
 At time k+1, the data matrices become X(k+1) = [x(k-w+2),x(k-w+3),…,x(k+1)], Y(k+1) = [y(k-w+2),y(k-w+3),…,y(k+1)]. We need to forget the oldest snapshot pair x(k-w+1),y(k-w+1), and remember the newest snapshot pair x(k+1),y(k+1). We can update the DMD matrix Ak = Yk*pinv(Xk) recursively by efficient rank-2 updating window DMD algroithm.  
 
-The time complexity (for one iteration) is O(n^2), and space complexity is 
-O(n^2), where n is the state dimension.  
+The time complexity (multiply–add operation for one iteration) is O(n^2), and space complexity is O(wn+2n^2), where n is the state dimension, and w is the window size.  
 
 ## Installation
 Download online DMD and window DMD implementation from github
@@ -50,9 +48,8 @@ Hao Zhang
 Clarence W. Rowley
 
 ## Reference:
-Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
-``Fast Quadratic Time Methods for Online Dynamic Mode Decomposition", 
-in production, 2017. To be submitted for publication, available on arXiv.
+Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,  
+``Online Dynamic Mode Decomposition for Time-varying Systems", in production, 2017. Available on arXiv.  
 
 ## Date created:
 April 2017
