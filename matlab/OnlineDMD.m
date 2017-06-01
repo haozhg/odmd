@@ -1,5 +1,5 @@
 % OnlineDMD is a class that implements online dynamic mode decomposition
-% The time complexity (for one iteration) is O(n^2), and space complexity is 
+% The time complexity (multiply?add operation for one iteration) is O(n^2), and space complexity is 
 % O(n^2), where n is the state dimension.
 %
 % Algorithm description:
@@ -8,9 +8,11 @@
 %       dimensional state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics. 
 %       Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then x(k), y(k)
 %       should be measurements corresponding to consecutive states z(k-1) and z(k).
-%       At time step K+1, we need to include new snapshot pair x(k+1), y(k+1)
+%       At time step k+1, we need to include new snapshot pair x(k+1), y(k+1)
 %       We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively 
 %       by efficient rank-1 updating online DMD algorithm.
+%       An exponential weighting factor can be used to place more weight on
+%       recent data.
 %
 % Usage:
 %       odmd = OnlineDMD(n,weighting)

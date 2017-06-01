@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 
 
 class WindowDMD:
     """WindowDMD is a class that implements window dynamic mode decomposition
-    The time complexity (for one iteration) is O(n^2), and space complexity is 
-    O(n^2), where n is the state dimension
+    The time complexity (multiply–add operation for one iteration) is O(n^2), and space complexity is 
+    O(wn+2n^2), where n is the state dimension, w is the window size.
 
     Algorithm description:
         At time step k, define two matrix 
@@ -18,6 +19,8 @@ class WindowDMD:
         and remember the new snapshot pair xnew = x(k+1), ynew = y(k+1)
         We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively 
         by efficient rank-2 updating window DMD algrithm.
+        An exponential weighting factor can be used to place more weight on
+        recent data.
         
     Usage:  
         wdmd = WindowDMD(n,windowsize)

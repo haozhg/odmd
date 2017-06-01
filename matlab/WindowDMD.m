@@ -1,6 +1,6 @@
 % WindowDMD is a class that implements window dynamic mode decomposition
-% The time complexity (for one iteration) is O(n^2), and space complexity is 
-% O(n^2), where n is the state dimension
+% The time complexity (multiply?add operation for one iteration) is O(n^2), and space complexity is 
+% O(wn+2n^2), where n is the state dimension, w is the window size.
 % 
 % Algorithm description:
 %       At time step k, define two matrix 
@@ -14,6 +14,8 @@
 %       and remember new snapshot pair xnew = x(k+1), ynew = y(k+1)
 %       We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively 
 %       by efficient rank-2 updating window DMD algorithm.
+%       An exponential weighting factor can be used to place more weight on
+%       recent data.
 %        
 % Usage:
 %       wdmd = WindowDMD(n,w,weighting)
@@ -75,7 +77,7 @@ classdef WindowDMD < handle
         end
         
         function initialize(obj, Xw, Yw)
-            % Initialize WnlineDMD with w snapshot pairs stored in (Xw, Yw)
+            % Initialize WindowDMD with w snapshot pairs stored in (Xw, Yw)
             % Usage: wdmd.initialize(Xw,Yw)
             q = length(Xw(1,:));
             if(obj.timestep == 0 && obj.w == q && rank(Xw) == obj.n)

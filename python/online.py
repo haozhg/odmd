@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 
 
 class OnlineDMD:
     """OnlineDMD is a class that implements online dynamic mode decomposition
-    The time complexity (for one iteration) is O(n^2), and space complexity is 
+    The time complexity (multiply–add operation for one iteration) is O(n^2), and space complexity is 
     O(n^2), where n is the state dimension.
     
     Algorithm description:
@@ -14,6 +15,8 @@ class OnlineDMD:
         should be measurements correponding to consecutive states z(k-1) and z(k).
         We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively 
         by efficient rank-1 updating online DMD algrithm.
+        An exponential weighting factor can be used to place more weight on
+        recent data.
     
     Usage:
         odmd = OnlineDMD(n,weighting)
