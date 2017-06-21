@@ -4,15 +4,17 @@ import numpy as np
 
 class OnlineDMD:
     """OnlineDMD is a class that implements online dynamic mode decomposition
-    The time complexity (multiply–add operation for one iteration) is O(n^2), and space complexity is 
-    O(n^2), where n is the state dimension.
+    The time complexity (multiply–add operation for one iteration) is O(4n^2), 
+    and space complexity is O(2n^2), where n is the state dimension.
     
     Algorithm description:
-        At time step k, define two matrix X(k) = [x(1),x(2),...,x(k)], Y(k) = [y(1),y(2),...,y(k)],
-        that contain all the past snapshot pairs, where x(k), y(k) are the n 
-        dimensional state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics. 
-        Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then x(k), y(k)
-        should be measurements correponding to consecutive states z(k-1) and z(k).
+        At time step k, define two matrix X(k) = [x(1),x(2),...,x(k)], 
+        Y(k) = [y(1),y(2),...,y(k)], that contain all the past snapshot pairs, 
+        where x(k), y(k) are the n dimensional state vector, y(k) = f(x(k)) is 
+        the image of x(k), f() is the dynamics. 
+        Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), 
+        then x(k), y(k) should be measurements correponding to consecutive 
+        states z(k-1) and z(k).
         We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively 
         by efficient rank-1 updating online DMD algrithm.
         An exponential weighting factor can be used to place more weight on
@@ -28,14 +30,17 @@ class OnlineDMD:
     properties:
         n: state dimension
         weighting: weighting factor between (0,1]
-        timestep: number of snapshot pairs processed (i.e., the current time step)
+        timestep: number of snapshot pairs processed (i.e., current time step)
         A: DMD matrix, size n by n
         P: Matrix that contains information about past snapshots, size n by n
 
     methods:
-        initialize(Xq, Yq), initialize online DMD algorithm with first q snapshot pairs stored in (Xq, Yq)
-        initializeghost(), initialize online DMD algorithm with epsilon small (1e-15) ghost snapshot pairs before t=0
-        update(x,y), update DMD computation when new snapshot pair (x,y) becomes available
+        initialize(Xq, Yq), initialize online DMD algorithm with first q 
+                            snapshot pairs stored in (Xq, Yq)
+        initializeghost(), initialize online DMD algorithm with epsilon small 
+                            (1e-15) ghost snapshot pairs before t=0
+        update(x,y), update DMD computation when new snapshot pair (x,y) 
+                            becomes available
         computemodes(), compute and return DMD eigenvalues and DMD modes
     
     Authors:
@@ -50,22 +55,19 @@ class OnlineDMD:
     Date created: April 2017
     
     To import the OnlineDMD class, add import online at head of Python scripts.
-    To look up this documentation, type help(online.OnlineDMD) or online.OnlineDMD?
+    To look up this documentation, type help(online.OnlineDMD) or 
+    online.OnlineDMD?
     """
-    def __init__(self, n=0, weighting=1, timestep=0, A=None, P=None):
+    def __init__(self, n=0, weighting=1):
         """
         Creat an object for online DMD
         Usage: odmd = OnlineDMD(n,weighting)
             """
         self.n = n
         self.weighting = weighting
-        self.timestep = timestep
-        if A is None or P is None:
-            self.A = np.zeros([n,n])
-            self.P = np.zeros([n,n])
-        else:
-            self.A = A
-            self.P = P
+        self.timestep = 0
+        self.A = np.zeros([n,n])
+        self.P = np.zeros([n,n])
 
     def initialize(self, Xq, Yq):
         """Initialize online DMD with first q snapshot pairs stored in (Xq, Yq)
@@ -81,7 +83,8 @@ class OnlineDMD:
             self.timestep += q
             
     def initializeghost(self):
-        """Initialize online DMD with epsilon small (1e-15) ghost snapshot pairs before t=0
+        """Initialize online DMD with epsilon small (1e-15) ghost snapshot pairs 
+        before t=0
         Usage: odmd.initilizeghost()
         """
         epsilon=1e-15
@@ -91,8 +94,9 @@ class OnlineDMD:
         
     def update(self, x, y):
         """Update the DMD computation with a new pair of snapshots (x,y)
-        Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), then (x,y)
-        should be measurements correponding to consecutive states z(k-1) and z(k).
+        Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), 
+        then (x,y) should be measurements correponding to consecutive states 
+        z(k-1) and z(k).
         Usage: odmd.update(x, y)
         """
         # compute P*x matrix vector product beforehand

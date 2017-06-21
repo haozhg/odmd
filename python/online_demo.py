@@ -4,20 +4,19 @@ An example to demonstrate online dynamic mode decomposition
 We take a 2D time varying system given by dx/dt = A(t)x
 where x = [x1,x2]', A(t) = [0,w(t);-w(t),0], 
 w(t)=1+epsilon*t, epsilon=0.1. The slowly time varying eigenvlaues of A(t)
-are pure imaginary, i.e, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary unit
+are pure imaginary, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary unit.
 
-At time step k, define two matrix X(k) = [x(1),x(2),...,x(k)], Y(k) = [y(1),y(2),...,y(k)],
-that contain all the past snapshot pairs, we would like to compute 
-Ak = Yk*pinv(Xk). This can be done by brute-force batch DMD, 
-and by efficient rank-1 updating online DMD algrithm.
+At time step k, define two matrix X(k) = [x(1),x(2),...,x(k)], 
+Y(k) = [y(1),y(2),...,y(k)], that contain all the past snapshot pairs, 
+we would like to compute Ak = Yk*pinv(Xk). This can be done by brute-force 
+batch DMD, and by efficient rank-1 updating online DMD algrithm. Batch DMD 
+computes DMD matrix by brute-force taking the pseudo-inverse directly.
+Online DMD computes the DMD matrix by using efficient rank-1 update idea.
 
-Batch DMD computes DMD matrix by brute-force taking the pseudo-inverse directly
-
-Online DMD computes the DMD matrix by using efficient rank-1 update idea
-
-We compare the performance of online DMD (with weighting=1,0.9) with the brute-force batch DMD
-approach in terms of tracking time varying eigenvalues, by comparison with the analytical solution
-Online DMD (weighting=1) and batch DMD should agree with each other (up to machine round-offer errors)
+We compare the performance of online DMD (with weighting=1,0.9) with the 
+brute-force batch DMD approach in terms of tracking time varying eigenvalues, 
+by comparison with the analytical solution. Online DMD (weighting=1) and 
+batch DMD should agree with each other (up to machine round-offer errors).
 
 Authors: 
     Hao Zhang

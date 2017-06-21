@@ -3,33 +3,32 @@
 % We take a 2D time varying system given by dx/dt = A(t)x
 % where x = [x1,x2]', A(t) = [0,w(t);-w(t),0], 
 % w(t)=1+epsilon*t, epsilon=0.1. The slowly time varying eigenvlaues of A(t)
-% are pure imaginary, i.e, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary unit
+% are pure imaginary, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary unit.
 % 
-% At time step k, define two matrix X(k) = [x(k-w+1),x(k-w+2),...,x(k)], Y(k) = [y(k-w+1),y(k-w+2),...,y(k)],
-% that contain the recent w snapshot pairs from a finite time window, 
-% we would like to compute Ak = Yk*pinv(Xk). 
-% At time step k+1, we need to forget old snapshot pair xold = x(k-w+1), yold = y(k-w+1), 
-% and remember new snapshot pair xnew = x(k+1), ynew = y(k+1)
-% This can be done by brute-force mini-batch DMD, 
-% and by efficient rank-2 updating window DMD algrithm.
-% 
-% Mini-batch DMD computes DMD matrix by taking the pseudo-inverse directly
-% 
-% Window DMD computes the DMD matrix by using efficient rank-2 update idea
+% At time step k, define two matrix X(k) = [x(k-w+1),x(k-w+2),...,x(k)], 
+% Y(k) = [y(k-w+1),y(k-w+2),...,y(k)], that contain the recent w snapshot pairs 
+% from a finite time window, we would like to compute Ak = Yk*pinv(Xk). This can 
+% be done by brute-force mini-batch DMD, and by efficient rank-2 updating window 
+% DMD algrithm. For window DMD, at time k+1, we need to forget the old snapshot 
+% pair xold = x(k-w+1), yold = y(k-w+1), and remember the new snapshot pair xnew 
+% = x(k+1), ynew = y(k+1). Mini-batch DMD computes DMD matrix by taking the 
+% pseudo-inverse directly. Window DMD computes the DMD matrix by using efficient 
+% rank-2 update idea.
 % 
 % We compare the performance of window DMD with the brute-force mini-batch DMD
-% approach in terms of tracking time varying eigenvalues, by comparison with the analytical solution
-% They should agree with each other (up to machine round-offer errors)
-% 
+% approach in terms of tracking time varying eigenvalues, by comparison with 
+% the analytical solution. They should agree with each other (up to machine 
+% round-offer errors).
+%     
 % Authors: 
-%   Hao Zhang
-%   Clarence W. Rowley
-% 
-% Reference:
-% Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
-% ``Online Dynamic Mode Decomposition for Time-varying Systems", 
-% in production, 2017. Available on arXiv.
-% 
+%     Hao Zhang
+%     Clarence W. Rowley
+%     
+% References:
+%     Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
+%     ``Online Dynamic Mode Decomposition for Time-varying Systems",  
+%     in production, 2017. Available on arXiv.
+%         
 % Date created: April 2017
 
 % define dynamics
@@ -86,7 +85,7 @@ wdmd.initialize(x(:,1:w), y(:,1:w));
 % window DMD
 tic
 for k = w+1:m
-    wdmd.update(x(:,k-w), y(:,k-w), x(:,k), y(:,k));
+    wdmd.update(x(:,k), y(:,k));
     evalswindowDMD1(:,k) = log(eig(wdmd.A))/dt;
 end
 elapsed_time = toc;
@@ -100,7 +99,7 @@ wdmd.initialize(x(:,1:w), y(:,1:w));
 % window DMD
 tic
 for k = w+1:m
-    wdmd.update(x(:,k-w), y(:,k-w), x(:,k), y(:,k));
+    wdmd.update(x(:,k), y(:,k));
     evalswindowDMD2(:,k) = log(eig(wdmd.A))/dt;
 end
 elapsed_time = toc;
