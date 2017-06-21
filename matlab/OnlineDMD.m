@@ -58,7 +58,7 @@
 classdef OnlineDMD < handle
     properties
         n = 0;                      % state dimension
-        weighting = 1;                 % weighting factor
+        weighting = 1;                 % weighting factor in (0,1]
         timestep = 0;               % number of snapshots processed
         A;          % DMD matrix
         P;          % matrix that contains information about past snapshots
@@ -71,6 +71,7 @@ classdef OnlineDMD < handle
             if nargin == 2
                 obj.n = n;
                 obj.weighting = weighting;
+                obj.timestep = 0;
                 obj.A = zeros(n,n);
                 obj.P = zeros(n,n);
             end

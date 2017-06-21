@@ -29,7 +29,7 @@ class OnlineDMD:
             
     properties:
         n: state dimension
-        weighting: weighting factor between (0,1]
+        weighting: weighting factor in (0,1]
         timestep: number of snapshot pairs processed (i.e., current time step)
         A: DMD matrix, size n by n
         P: Matrix that contains information about past snapshots, size n by n

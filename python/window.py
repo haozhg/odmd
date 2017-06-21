@@ -33,7 +33,7 @@ class WindowDMD:
     properties:
         n: state dimension
         w: window size
-        weighting: weighting factor
+        weighting: weighting factor in (0,1]
         timestep: number of snapshot pairs processed (i.e., current time step)
         Xw: recent w snapshots x stored in Xw, size n by w
         Yw: recent w snapshots y stored in Yw, size n by w
@@ -110,9 +110,9 @@ class WindowDMD:
         # define matrices
         U, V = np.column_stack((xold, xnew)), np.column_stack((yold, ynew))
         C = np.diag([-(self.weighting)**(self.w),1])
-        # compute PkU matrix vector product beforehand
+        # compute PkU matrix matrix product beforehand
         PkU = self.P.dot(U)
-        # compute AkU matrix vector product beforehand
+        # compute AkU matrix matrix product beforehand
         AkU = self.A.dot(U)
         # compute Gamma
         Gamma = np.linalg.inv(np.linalg.inv(C)+U.T.dot(PkU))

@@ -64,7 +64,7 @@ classdef WindowDMD < handle
     properties
         n = 0;              % state dimension
         w = 0;              % window size
-        weighting = 1;      % weighting factor
+        weighting = 1;      % weighting factor in (0,1]
         timestep = 0;       % number of snapshots processed
         Xw;     % recent w snapshots x stored in matrix Xw
         Yw;     % recent w snapshots y stored in matrix Yw
@@ -81,6 +81,7 @@ classdef WindowDMD < handle
                 obj.n = n;
                 obj.w = w;
                 obj.weighting = weighting;
+                obj.timestep = 0;
                 obj.Xw = zeros(n,w);
                 obj.Yw = zeros(n,w);
                 obj.A = zeros(n,n);
@@ -129,9 +130,9 @@ classdef WindowDMD < handle
             % define matrices
             U = [xold, xnew]; V = [yold, ynew]; 
             C = diag([-(obj.weighting)^(obj.w),1]);
-            % compute PkU matrix vector product beforehand
+            % compute PkU matrix matrix product beforehand
             PkU = obj.P*U;
-            % compute AkU matrix vector product beforehand
+            % compute AkU matrix matrix product beforehand
             AkU = obj.A*U;
             % compute Gamma
             Gamma = inv(inv(C)+U'*PkU);
