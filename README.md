@@ -49,7 +49,7 @@ Clarence W. Rowley
 
 ## Reference:
 Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
-``Online Dynamic Mode Decomposition for Time-varying Systems,”
+“Online Dynamic Mode Decomposition for Time-varying Systems,”
 arXiv preprint arXiv:1707.02876, 2017.  
 
 ## Date created:
