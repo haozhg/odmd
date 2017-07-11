@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 An example to demonstrate window dynamic mode decomposition
 
@@ -27,8 +28,8 @@ Authors:
     
 References:
     Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
-    ``Online Dynamic Mode Decomposition for Time-varying Systems",  
-    in production, 2017. Available on arXiv.
+    ``Online Dynamic Mode Decomposition for Time-varying Systems,”
+    arXiv preprint arXiv:1707.02876, 2017.
         
 Date created: April 2017
 """
