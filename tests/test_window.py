@@ -1,6 +1,8 @@
 import numpy as np
 from odmd import WindowDMD
 
+EPS = 1e-6
+
 
 def test_window():
     for n in range(2, 10):
@@ -17,4 +19,4 @@ def test_window():
         for i in range(2 * n, m):
             windowdmd.update(X[:, i], Y[:, i])
             if i >= 2 * n:
-                assert np.linalg.norm(windowdmd.A - A) < 1e-6
+                assert np.linalg.norm(windowdmd.A - A) < EPS
