@@ -35,46 +35,47 @@ Date created: April 2017
 """
 
 
-import sys
-sys.path.append('..')
+import time
 
-from window import WindowDMD
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import odeint
-import time
-import matplotlib.pyplot as plt
-
+from window import WindowDMD
 
 # define dynamics
 epsilon = 1e-1
-def dyn(x,t):
+
+
+def dyn(x, t):
     x1, x2 = x
-    dxdt = [(1+epsilon*t)*x2,-(1+epsilon*t)*x1]
+    dxdt = [(1+epsilon*t)*x2, -(1+epsilon*t)*x1]
     return dxdt
-# integrate from initial condition [1,0]    
-tspan = np.linspace(0,10,101)
+
+
+# integrate from initial condition [1,0]
+tspan = np.linspace(0, 10, 101)
 dt = 0.1
-x0 = [1,0]
-xsol = odeint(dyn,x0,tspan).T
+x0 = [1, 0]
+xsol = odeint(dyn, x0, tspan).T
 # extract snapshots
-x, y = xsol[:,:-1], xsol[:,1:]
+x, y = xsol[:, :-1], xsol[:, 1:]
 t = tspan[1:]
 # true dynamics, true eigenvalues
-n, m = len(x[:,0]), len(x[0,:])
-A = np.empty((n,n,m))
-evals = np.empty((n,m),dtype=complex)
+n, m = len(x[:, 0]), len(x[0, :])
+A = np.empty((n, n, m))
+evals = np.empty((n, m), dtype=complex)
 for k in range(m):
-    A[:,:,k] = np.array([[0,(1+epsilon*t[k])],[-(1+epsilon*t[k]),0]])
-    evals[:,k] = np.linalg.eigvals(A[:,:,k])
+    A[:, :, k] = np.array([[0, (1+epsilon*t[k])], [-(1+epsilon*t[k]), 0]])
+    evals[:, k] = np.linalg.eigvals(A[:, :, k])
 
 
 # visualize snapshots
 plt.figure()
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-plt.plot(tspan, xsol[0,:], 'bs-', linewidth=2.0,  label='$x_1(t)$')
-plt.plot(tspan, xsol[1,:], 'g^-', linewidth=2.0,  label='$x_2(t)$')
-plt.legend(loc='best',fontsize=20 ,shadow=True)
+plt.plot(tspan, xsol[0, :], 'bs-', linewidth=2.0,  label='$x_1(t)$')
+plt.plot(tspan, xsol[1, :], 'g^-', linewidth=2.0,  label='$x_2(t)$')
+plt.legend(loc='best', fontsize=20, shadow=True)
 plt.xlabel('Time', fontsize=20)
 plt.title('Snapshots', fontsize=20)
 plt.tick_params(labelsize=20)
@@ -84,36 +85,38 @@ plt.show()
 
 # mini-batch DMD, w = 10
 w = 10
-AminibatchDMD = np.empty((n,n,m))
-evalsminibatchDMD = np.empty((n,m),dtype=complex)
+AminibatchDMD = np.empty((n, n, m))
+evalsminibatchDMD = np.empty((n, m), dtype=complex)
 start = time.clock()
-for k in range(w,m):
-    AminibatchDMD[:,:,k] = y[:,k-w+1:k+1].dot(np.linalg.pinv(x[:,k-w+1:k+1]))
-    evalsminibatchDMD[:,k] = np.log(np.linalg.eigvals(AminibatchDMD[:,:,k]))/dt
+for k in range(w, m):
+    AminibatchDMD[:, :, k] = y[:, k-w+1:k +
+                               1].dot(np.linalg.pinv(x[:, k-w+1:k+1]))
+    evalsminibatchDMD[:, k] = np.log(
+        np.linalg.eigvals(AminibatchDMD[:, :, k]))/dt
 end = time.clock()
 print "Mini-batch DMD, w = 10, time = " + str(end-start) + " secs"
 
 
 # Window DMD, w = 10, weighting = 1
-evalswindowDMD1 = np.empty((n,m),dtype=complex)
-wdmd = WindowDMD(n,w,1)
-wdmd.initialize(x[:,:w],y[:,:w])
+evalswindowDMD1 = np.empty((n, m), dtype=complex)
+wdmd = WindowDMD(n, w, 1)
+wdmd.initialize(x[:, :w], y[:, :w])
 start = time.clock()
-for k in range(w,m):
-    wdmd.update(x[:,k],y[:,k])
-    evalswindowDMD1[:,k] = np.log(np.linalg.eigvals(wdmd.A))/dt
+for k in range(w, m):
+    wdmd.update(x[:, k], y[:, k])
+    evalswindowDMD1[:, k] = np.log(np.linalg.eigvals(wdmd.A))/dt
 end = time.clock()
 print "Window DMD, w=10, weighting = 1, time = " + str(end-start) + " secs"
 
 
 # Window DMD, w = 10, weighting = 0.5
-evalswindowDMD2 = np.empty((n,m),dtype=complex)
-wdmd = WindowDMD(n,w,0.5)
-wdmd.initialize(x[:,:w],y[:,:w])
+evalswindowDMD2 = np.empty((n, m), dtype=complex)
+wdmd = WindowDMD(n, w, 0.5)
+wdmd.initialize(x[:, :w], y[:, :w])
 start = time.clock()
-for k in range(w,m):
-    wdmd.update(x[:,k],y[:,k])
-    evalswindowDMD2[:,k] = np.log(np.linalg.eigvals(wdmd.A))/dt
+for k in range(w, m):
+    wdmd.update(x[:, k], y[:, k])
+    evalswindowDMD2[:, k] = np.log(np.linalg.eigvals(wdmd.A))/dt
 end = time.clock()
 print "Window DMD, w=10, weighting = 0.5, time = " + str(end-start) + " secs"
 
@@ -122,14 +125,17 @@ print "Window DMD, w=10, weighting = 0.5, time = " + str(end-start) + " secs"
 plt.figure()
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-plt.plot(t, np.imag(evals[0,:]), 'k-',label='True',linewidth=2.0)
-plt.plot(t[w:], np.imag(evalsminibatchDMD[0,w:]), 'r-',label='Mini-batch, $w=10$',linewidth=2.0)
-plt.plot(t[w:], np.imag(evalswindowDMD1[0,w:]), 'g--',label='Window, $w=10$, $wf=1$',linewidth=2.0)
-plt.plot(t[w:], np.imag(evalswindowDMD2[0,w:]), 'b--',label='Window, $w=10$, $wf=0.5$',linewidth=2.0)
+plt.plot(t, np.imag(evals[0, :]), 'k-', label='True', linewidth=2.0)
+plt.plot(t[w:], np.imag(evalsminibatchDMD[0, w:]), 'r-',
+         label='Mini-batch, $w=10$', linewidth=2.0)
+plt.plot(t[w:], np.imag(evalswindowDMD1[0, w:]), 'g--',
+         label='Window, $w=10$, $wf=1$', linewidth=2.0)
+plt.plot(t[w:], np.imag(evalswindowDMD2[0, w:]), 'b--',
+         label='Window, $w=10$, $wf=0.5$', linewidth=2.0)
 plt.tick_params(labelsize=20)
 plt.xlabel('Time', fontsize=20)
 plt.ylabel('Im($\lambda_{DMD}$)', fontsize=20)
 plt.legend(loc='best', fontsize=20, shadow=True)
-plt.xlim([0,10])
-plt.ylim([1,2])
+plt.xlim([0, 10])
+plt.ylim([1, 2])
 plt.show()

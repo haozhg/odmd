@@ -1,0 +1,4 @@
+odmd
+numpy
+scipy
+matplotlib

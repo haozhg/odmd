@@ -32,46 +32,47 @@ Date created: April 2017
 """
 
 
-import sys
-sys.path.append('..')
-
-from online import OnlineDMD
-import numpy as np
-from scipy.integrate import odeint
 import time
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
+from online import OnlineDMD
+from scipy.integrate import odeint
 
 # define dynamics
 epsilon = 1e-1
-def dyn(x,t):
+
+
+def dyn(x, t):
     x1, x2 = x
-    dxdt = [(1+epsilon*t)*x2,-(1+epsilon*t)*x1]
+    dxdt = [(1+epsilon*t)*x2, -(1+epsilon*t)*x1]
     return dxdt
-# integrate from initial condition [1,0]    
-tspan = np.linspace(0,10,101)
+
+
+# integrate from initial condition [1,0]
+tspan = np.linspace(0, 10, 101)
 dt = 0.1
-x0 = [1,0]
-xsol = odeint(dyn,x0,tspan).T
+x0 = [1, 0]
+xsol = odeint(dyn, x0, tspan).T
 # extract snapshots
-x, y = xsol[:,:-1], xsol[:,1:]
+x, y = xsol[:, :-1], xsol[:, 1:]
 t = tspan[1:]
 # true dynamics, true eigenvalues
-n, m = len(x[:,0]), len(x[0,:])
-A = np.empty((n,n,m))
-evals = np.empty((n,m),dtype=complex)
+n, m = len(x[:, 0]), len(x[0, :])
+A = np.empty((n, n, m))
+evals = np.empty((n, m), dtype=complex)
 for k in range(m):
-    A[:,:,k] = np.array([[0,(1+epsilon*t[k])],[-(1+epsilon*t[k]),0]])
-    evals[:,k] = np.linalg.eigvals(A[:,:,k])
+    A[:, :, k] = np.array([[0, (1+epsilon*t[k])], [-(1+epsilon*t[k]), 0]])
+    evals[:, k] = np.linalg.eigvals(A[:, :, k])
 
 
 # visualize snapshots
 plt.figure()
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-plt.plot(tspan, xsol[0,:], 'bs-', linewidth=2.0,  label='$x_1(t)$')
-plt.plot(tspan, xsol[1,:], 'g^-', linewidth=2.0,  label='$x_2(t)$')
-plt.legend(loc='best',fontsize=20 ,shadow=True)
+plt.plot(tspan, xsol[0, :], 'bs-', linewidth=2.0,  label='$x_1(t)$')
+plt.plot(tspan, xsol[1, :], 'g^-', linewidth=2.0,  label='$x_2(t)$')
+plt.legend(loc='best', fontsize=20, shadow=True)
 plt.xlabel('Time', fontsize=20)
 plt.title('Snapshots', fontsize=20)
 plt.tick_params(labelsize=20)
@@ -81,36 +82,36 @@ plt.show()
 
 # batch DMD
 q = 10
-AbatchDMD = np.empty((n,n,m))
-evalsbatchDMD = np.empty((n,m),dtype=complex)
+AbatchDMD = np.empty((n, n, m))
+evalsbatchDMD = np.empty((n, m), dtype=complex)
 start = time.clock()
-for k in range(q,m):
-    AbatchDMD[:,:,k] = y[:,:k+1].dot(np.linalg.pinv(x[:,:k+1]))
-    evalsbatchDMD[:,k] = np.log(np.linalg.eigvals(AbatchDMD[:,:,k]))/dt
+for k in range(q, m):
+    AbatchDMD[:, :, k] = y[:, :k+1].dot(np.linalg.pinv(x[:, :k+1]))
+    evalsbatchDMD[:, k] = np.log(np.linalg.eigvals(AbatchDMD[:, :, k]))/dt
 end = time.clock()
 print "Batch DMD, time = " + str(end-start) + " secs"
 
 
 # Online DMD, weighting = 1
-evalsonlineDMD1 = np.empty((n,m),dtype=complex)
-odmd = OnlineDMD(n,1.0)
-odmd.initialize(x[:,:q],y[:,:q])
+evalsonlineDMD1 = np.empty((n, m), dtype=complex)
+odmd = OnlineDMD(n, 1.0)
+odmd.initialize(x[:, :q], y[:, :q])
 start = time.clock()
-for k in range(q,m):
-    odmd.update(x[:,k],y[:,k])
-    evalsonlineDMD1[:,k] = np.log(np.linalg.eigvals(odmd.A))/dt
+for k in range(q, m):
+    odmd.update(x[:, k], y[:, k])
+    evalsonlineDMD1[:, k] = np.log(np.linalg.eigvals(odmd.A))/dt
 end = time.clock()
 print "Online DMD, weighting = 1, time = " + str(end-start) + " secs"
 
 
 # Online DMD, weighting = 0.9
-evalsonlineDMD2 = np.empty((n,m),dtype=complex)
-odmd = OnlineDMD(n,0.9)
-odmd.initialize(x[:,:q],y[:,:q])
+evalsonlineDMD2 = np.empty((n, m), dtype=complex)
+odmd = OnlineDMD(n, 0.9)
+odmd.initialize(x[:, :q], y[:, :q])
 start = time.clock()
-for k in range(q,m):
-    odmd.update(x[:,k],y[:,k])
-    evalsonlineDMD2[:,k] = np.log(np.linalg.eigvals(odmd.A))/dt
+for k in range(q, m):
+    odmd.update(x[:, k], y[:, k])
+    evalsonlineDMD2[:, k] = np.log(np.linalg.eigvals(odmd.A))/dt
 end = time.clock()
 print "Online DMD, weighting = 0.9, time = " + str(end-start) + " secs"
 
@@ -119,14 +120,17 @@ print "Online DMD, weighting = 0.9, time = " + str(end-start) + " secs"
 plt.figure()
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-plt.plot(t, np.imag(evals[0,:]), 'k-',label='True',linewidth=2.0)
-plt.plot(t[q:], np.imag(evalsbatchDMD[0,q:]), 'r-',label='Batch',linewidth=2.0)
-plt.plot(t[q:], np.imag(evalsonlineDMD1[0,q:]), 'g--',label='Online, $wf=1$',linewidth=2.0)
-plt.plot(t[q:], np.imag(evalsonlineDMD2[0,q:]), 'b--',label='Online, $wf=0.9$',linewidth=2.0)
+plt.plot(t, np.imag(evals[0, :]), 'k-', label='True', linewidth=2.0)
+plt.plot(t[q:], np.imag(evalsbatchDMD[0, q:]),
+         'r-', label='Batch', linewidth=2.0)
+plt.plot(t[q:], np.imag(evalsonlineDMD1[0, q:]),
+         'g--', label='Online, $wf=1$', linewidth=2.0)
+plt.plot(t[q:], np.imag(evalsonlineDMD2[0, q:]), 'b--',
+         label='Online, $wf=0.9$', linewidth=2.0)
 plt.tick_params(labelsize=20)
 plt.xlabel('Time', fontsize=20)
 plt.ylabel('Im($\lambda_{DMD}$)', fontsize=20)
 plt.legend(loc='best', fontsize=20, shadow=True)
-plt.xlim([0,10])
-plt.ylim([1,2])
+plt.xlim([0, 10])
+plt.ylim([1, 2])
 plt.show()

@@ -23,13 +23,13 @@ class WindowDMD:
         by efficient rank-2 updating window DMD algrithm.
         An exponential weighting factor can be used to place more weight on
         recent data.
-        
+
     Usage:  
         wdmd = WindowDMD(n,w)
         wdmd.initialize(Xw,Yw)
         wdmd.update(xnew,ynew)
         evals, modes = wdmd.computemodes()
-            
+
     properties:
         n: state dimension
         w: window size
@@ -44,22 +44,23 @@ class WindowDMD:
         initialize(Xw, Yw), initialize window DMD algorithm with w snapshot pairs
         update(xnew,ynew), update DMD computation by adding a new snapshot pair
         computemodes(), compute and return DMD eigenvalues and DMD modes
-        
+
     Authors:
         Hao Zhang
         Clarence W. Rowley
-        
+
     References:
         Hao Zhang, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta,
         "Online Dynamic Mode Decomposition for Time-varying Systems,"
         arXiv preprint arXiv:1707.02876, 2017.
-    
+
     Date created: April 2017
-    
+
     To import the WindowDMD class, add import window at head of Python scripts.
     To look up this documentation, type help(window.WindowDMD) 
     or window.WindowDMD?
     """
+
     def __init__(self, n=0, w=0, weighting=1):
         """
         Creat an object for window DMD
@@ -69,10 +70,10 @@ class WindowDMD:
         self.w = w
         self.weighting = weighting
         self.timestep = 0
-        self.Xw = np.zeros([n,w])
-        self.Yw = np.zeros([n,w])
-        self.A = np.zeros([n,n])
-        self.P = np.zeros([n,n])
+        self.Xw = np.zeros([n, w])
+        self.Yw = np.zeros([n, w])
+        self.A = np.zeros([n, n])
+        self.P = np.zeros([n, n])
 
     def initialize(self, Xw, Yw):
         """Initialize window DMD with first w snapshot pairs stored in (Xw, Yw)
@@ -81,15 +82,15 @@ class WindowDMD:
         # initialize Xw, Yw
         self.Xw, self.Yw = Xw, Yw
         # initialize A, P
-        q = len(Xw[0,:])
+        q = len(Xw[0, :])
         if self.timestep == 0 and self.w == q \
-        and np.linalg.matrix_rank(Xw) == self.n:
-            weight = np.sqrt(self.weighting)**range(q-1,-1,-1)
+                and np.linalg.matrix_rank(Xw) == self.n:
+            weight = np.sqrt(self.weighting)**range(q-1, -1, -1)
             Xwhat, Ywhat = weight*Xw, weight*Yw
             self.A = Ywhat.dot(np.linalg.pinv(Xwhat))
             self.P = np.linalg.inv(Xwhat.dot(Xwhat.T))/self.weighting
             self.timestep += q
-        
+
     def update(self, xnew, ynew):
         """Update the DMD computation by sliding the finite time window forward
         Forget the oldest pair of snapshots (xold, yold), and remembers the newest 
@@ -101,15 +102,15 @@ class WindowDMD:
         Usage: wdmd.update(xnew, ynew)
         """
         # define old snapshots to be discarded
-        xold, yold = self.Xw[:,0], self.Yw[:,0]
+        xold, yold = self.Xw[:, 0], self.Yw[:, 0]
         # Update recent w snapshots
-        self.Xw = np.column_stack((self.Xw[:,1:], xnew))
-        self.Yw = np.column_stack((self.Yw[:,1:], ynew))
-        
+        self.Xw = np.column_stack((self.Xw[:, 1:], xnew))
+        self.Yw = np.column_stack((self.Yw[:, 1:], ynew))
+
         # direct rank-2 update
         # define matrices
         U, V = np.column_stack((xold, xnew)), np.column_stack((yold, ynew))
-        C = np.diag([-(self.weighting)**(self.w),1])
+        C = np.diag([-(self.weighting)**(self.w), 1])
         # compute PkU matrix matrix product beforehand
         PkU = self.P.dot(U)
         # compute AkU matrix matrix product beforehand
@@ -122,7 +123,7 @@ class WindowDMD:
         self.P = (self.P - PkU.dot(Gamma).dot(PkU.T))/self.weighting
         # ensure P is SPD by taking its symmetric part
         self.P = (self.P + self.P.T)/2
-        
+
         # time step + 1
         self.timestep += 1
 
