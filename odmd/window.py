@@ -8,27 +8,27 @@ logger = logging.getLogger(__name__)
 
 class WindowDMD:
     """WindowDMD is a class that implements window dynamic mode decomposition
-    The time complexity (multiply–add operation for one iteration) is O(8n^2), 
-    and space complexity is O(2wn+2n^2), where n is the state dimension, w is 
+    The time complexity (multiply–add operation for one iteration) is O(8n^2),
+    and space complexity is O(2wn+2n^2), where n is the state dimension, w is
     the window size.
 
     Algorithm description:
-        At time step k, define two matrix X(k) = [x(k-w+1),x(k-w+2),...,x(k)], 
-        Y(k) = [y(k-w+1),y(k-w+2),...,y(k)], that contain the recent w snapshot 
-        pairs from a finite time window, where x(k), y(k) are the n dimensional 
-        state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics. 
-        Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)), 
-        then x(k), y(k) should be measurements correponding to consecutive 
+        At time step k, define two matrix X(k) = [x(k-w+1),x(k-w+2),...,x(k)],
+        Y(k) = [y(k-w+1),y(k-w+2),...,y(k)], that contain the recent w snapshot
+        pairs from a finite time window, where x(k), y(k) are the n dimensional
+        state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics.
+        Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)),
+        then x(k), y(k) should be measurements correponding to consecutive
         states z(k-1) and z(k).
-        At time k+1, we need to forget the old snapshot pair xold = x(k-w+1), 
-        yold = y(k-w+1), and remember the new snapshot pair x = x(k+1), 
+        At time k+1, we need to forget the old snapshot pair xold = x(k-w+1),
+        yold = y(k-w+1), and remember the new snapshot pair x = x(k+1),
         y = y(k+1).
-        We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively 
+        We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively
         by efficient rank-2 updating window DMD algrithm.
         An exponential weighting factor can be used to place more weight on
         recent data.
 
-    Usage:  
+    Usage:
         wdmd = WindowDMD(n,w)
         wdmd.initialize(Xw,Yw) # this is necessary
         wdmd.update(x,y)
@@ -54,8 +54,8 @@ class WindowDMD:
         Clarence W. Rowley
 
     References:
-        Zhang, Hao, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta. 
-        "Online dynamic mode decomposition for time-varying systems." 
+        Zhang, Hao, Clarence W. Rowley, Eric A. Deem, and Louis N. Cattafesta.
+        "Online dynamic mode decomposition for time-varying systems."
         SIAM Journal on Applied Dynamical Systems 18, no. 3 (2019): 1586-1609.
 
     Date created: April 2017
@@ -65,7 +65,7 @@ class WindowDMD:
         """
         Creat an object for window DMD
         Usage: wdmd = WindowDMD(n,w,weighting)
-            """
+        """
         assert n >= 1 and isinstance(n, int)
         assert w >= 1 and isinstance(w, int)
         assert weighting > 0 and weighting <= 1
@@ -97,28 +97,26 @@ class WindowDMD:
 
         # initialize A, P
         q = len(Xw[0, :])
-        if self.timestep == 0 and self.w == q \
-                and np.linalg.matrix_rank(Xw) == self.n:
-            weight = np.sqrt(self.weighting)**range(q-1, -1, -1)
-            Xwhat, Ywhat = weight*Xw, weight*Yw
+        if self.timestep == 0 and self.w == q and np.linalg.matrix_rank(Xw) == self.n:
+            weight = np.sqrt(self.weighting) ** range(q - 1, -1, -1)
+            Xwhat, Ywhat = weight * Xw, weight * Yw
             self.A = Ywhat.dot(np.linalg.pinv(Xwhat))
-            self.P = np.linalg.inv(Xwhat.dot(Xwhat.T))/self.weighting
+            self.P = np.linalg.inv(Xwhat.dot(Xwhat.T)) / self.weighting
             self.timestep += q
         self.ready = True
 
     def update(self, x, y):
         """Update the DMD computation by sliding the finite time window forward
-        Forget the oldest pair of snapshots (xold, yold), and remembers the newest 
-        pair of snapshots (x, y) in the new time window. If the new finite 
+        Forget the oldest pair of snapshots (xold, yold), and remembers the newest
+        pair of snapshots (x, y) in the new time window. If the new finite
         time window at time step k+1 includes recent w snapshot pairs as
         X(k+1) = [x(k-w+2),x(k-w+3),...,x(k+1)], Y(k+1) = [y(k-w+2),y(k-w+3),
-        ...,y(k+1)], where y(k) = f(x(k)) and f is the dynamics, then we should 
+        ...,y(k+1)], where y(k) = f(x(k)) and f is the dynamics, then we should
         take x = x(k+1), y = y(k+1)
         Usage: wdmd.update(x, y)
         """
         if not self.ready:
-            raise Exception(
-                "Not initialized yet! Need to call self.initialize(Xw, Yw)")
+            raise Exception("Not initialized yet! Need to call self.initialize(Xw, Yw)")
 
         assert x is not None and y is not None
         x, y = np.array(x), np.array(y)
@@ -135,19 +133,19 @@ class WindowDMD:
         # direct rank-2 update
         # define matrices
         U, V = np.column_stack((xold, x)), np.column_stack((yold, y))
-        C = np.diag([-(self.weighting)**(self.w), 1])
+        C = np.diag([-((self.weighting) ** (self.w)), 1])
         # compute PkU matrix matrix product beforehand
         PkU = self.P.dot(U)
         # compute AkU matrix matrix product beforehand
         AkU = self.A.dot(U)
         # compute Gamma
-        Gamma = np.linalg.inv(np.linalg.inv(C)+U.T.dot(PkU))
+        Gamma = np.linalg.inv(np.linalg.inv(C) + U.T.dot(PkU))
         # update A
-        self.A += (V-AkU).dot(Gamma).dot(PkU.T)
+        self.A += (V - AkU).dot(Gamma).dot(PkU.T)
         # update P
-        self.P = (self.P - PkU.dot(Gamma).dot(PkU.T))/self.weighting
+        self.P = (self.P - PkU.dot(Gamma).dot(PkU.T)) / self.weighting
         # ensure P is SPD by taking its symmetric part
-        self.P = (self.P + self.P.T)/2
+        self.P = (self.P + self.P.T) / 2
 
         # time step + 1
         self.timestep += 1
@@ -157,7 +155,6 @@ class WindowDMD:
         Usage: evals, modes = wdmd.computemodes()
         """
         if not self.ready:
-            raise Exception(
-                "Not initialized yet! Need to call self.initialize(Xw, Yw)")
+            raise Exception("Not initialized yet! Need to call self.initialize(Xw, Yw)")
         evals, modes = np.linalg.eig(self.A)
         return evals, modes

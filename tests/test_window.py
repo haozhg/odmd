@@ -14,7 +14,7 @@ def test_window():
         # run window DMD
         windowdmd = WindowDMD(n, 2 * n)
         # initialize
-        windowdmd.initialize(X[:, :2 * n], Y[:, :2 * n])
+        windowdmd.initialize(X[:, : 2 * n], Y[:, : 2 * n])
         # online update
         for i in range(2 * n, m):
             windowdmd.update(X[:, i], Y[:, i])
