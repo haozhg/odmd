@@ -34,7 +34,6 @@ class OnlineDMD:
         weighting: weighting factor in (0,1]
         timestep: number of snapshot pairs processed (i.e., current time step)
         A: DMD matrix, size n by n
-        P: Matrix that contains information about past snapshots, size n by n
 
     methods:
         initialize(Xq=None, Yq=None), initialize online DMD algorithm with first q 
@@ -55,7 +54,7 @@ class OnlineDMD:
     Date created: April 2017
     """
 
-    def __init__(self, n: int, weighting: float = 1):
+    def __init__(self, n: int, weighting: float = 1.0):
         """
         Creat an object for online DMD
         Usage: odmd = OnlineDMD(n,weighting)
@@ -67,7 +66,7 @@ class OnlineDMD:
         self.weighting = weighting
         self.timestep = 0
         self.A = np.zeros([n, n])
-        self.P = np.zeros([n, n])
+        self._P = np.zeros([n, n])
         # initialize
         self._initialize()
 
@@ -77,16 +76,18 @@ class OnlineDMD:
         epsilon = 1e-15
         alpha = 1.0/epsilon
         self.A = np.random.randn(self.n, self.n)
-        self.P = alpha*np.identity(self.n)
+        self._P = alpha*np.identity(self.n)
 
     def initialize(self, Xq, Yq):
-        """Initialize online DMD with first q snapshot pairs stored in (Xq, Yq)
+        """Initialize online DMD with first q (q >= n) snapshot pairs stored in (Xq, Yq)
         Usage: odmd.initialize(Xq,Yq)
         """
         assert Xq is not None and Yq is not None
-        assert np.array(Xq).shape == np.array(Yq).shape
-        assert np.array(Xq).shape[0] == self.n
-        assert np.array(Xq).shape[1] >= self.n
+        Xq, Yq = np.array(Xq), np.array(Yq)
+        assert Xq.shape == Yq.shape
+        assert Xq.shape[0] == self.n
+        # necessary condition for over-constrained initialization
+        assert Xq.shape[1] >= self.n
 
         q = len(Xq[0, :])
         Xqhat, Yqhat = np.zeros(Xq.shape), np.zeros(Yq.shape)
@@ -94,7 +95,7 @@ class OnlineDMD:
             weight = np.sqrt(self.weighting)**range(q-1, -1, -1)
             Xqhat, Yqhat = weight*Xq, weight*Yq
             self.A = Yqhat.dot(np.linalg.pinv(Xqhat))
-            self.P = np.linalg.inv(Xqhat.dot(Xqhat.T))/self.weighting
+            self._P = np.linalg.inv(Xqhat.dot(Xqhat.T))/self.weighting
             self.timestep += q
 
     def update(self, x, y):
@@ -104,19 +105,22 @@ class OnlineDMD:
         z(k-1) and z(k).
         Usage: odmd.update(x, y)
         """
+        assert x is not None and y is not None
+        x, y = np.array(x), np.array(y)
         assert np.array(x).shape == np.array(y).shape
         assert np.array(x).shape[0] == self.n
 
         # compute P*x matrix vector product beforehand
-        Px = self.P.dot(x)
+        Px = self._P.dot(x)
         # compute gamma
         gamma = 1.0/(1 + x.T.dot(Px))
         # update A
         self.A += np.outer(gamma*(y-self.A.dot(x)), Px)
         # update P, group Px*Px' to ensure positive definite
-        self.P = (self.P - gamma*np.outer(Px, Px))/self.weighting
+        self._P = (self._P - gamma*np.outer(Px, Px))/self.weighting
         # ensure P is SPD by taking its symmetric part
-        self.P = (self.P + self.P.T)/2
+        self._P = (self._P + self._P.T)/2
+
         # time step + 1
         self.timestep += 1
 

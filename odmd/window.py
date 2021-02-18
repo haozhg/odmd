@@ -1,4 +1,5 @@
 import logging
+from collections import deque
 
 import numpy as np
 
@@ -73,8 +74,8 @@ class WindowDMD:
         self.w = w
         self.weighting = weighting
         self.timestep = 0
-        self.Xw = np.zeros([n, w])
-        self.Yw = np.zeros([n, w])
+        self.Xw = deque()
+        self.Yw = deque()
         self.A = np.zeros([n, n])
         self.P = np.zeros([n, n])
         # need to call initialize before update() and computemodes()
@@ -85,11 +86,15 @@ class WindowDMD:
         Usage: wdmd.initialize(Xw,Yw)
         """
         assert Xw is not None and Yw is not None
-        assert np.array(Xw).shape == np.array(Yw).shape
-        assert np.array(Xw).shape == (self.n, self.w)
+        Xw, Yw = np.array(Xw), np.array(Yw)
+        assert Xw.shape == Yw.shape
+        assert Xw.shape == (self.n, self.w)
 
-        # initialize Xw, Yw
-        self.Xw, self.Yw = Xw, Yw
+        # initialize Xw, Yw queue
+        for i in range(self.w):
+            self.Xw.append(Xw[:, i])
+            self.Yw.append(Yw[:, i])
+
         # initialize A, P
         q = len(Xw[0, :])
         if self.timestep == 0 and self.w == q \
@@ -115,14 +120,17 @@ class WindowDMD:
             raise Exception(
                 "Not initialized yet! Need to call self.initialize(Xw, Yw)")
 
+        assert x is not None and y is not None
+        x, y = np.array(x), np.array(y)
+
         assert np.array(x).shape == np.array(y).shape
         assert np.array(x).shape[0] == self.n
 
         # define old snapshots to be discarded
-        xold, yold = self.Xw[:, 0], self.Yw[:, 0]
+        xold, yold = self.Xw.popleft(), self.Yw.popleft()
         # Update recent w snapshots
-        self.Xw = np.column_stack((self.Xw[:, 1:], x))
-        self.Yw = np.column_stack((self.Yw[:, 1:], y))
+        self.Xw.append(x)
+        self.Yw.append(y)
 
         # direct rank-2 update
         # define matrices
