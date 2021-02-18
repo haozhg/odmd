@@ -14,12 +14,12 @@ setup(
     url="https://github.com/haozhg/odmd",
     author="Hao Zhang",
     author_email="haozhang@alumni.princeton.edu",
-    # license="MIT",
-    # classifiers=[
-    #     "License :: OSI Approved :: MIT License",
-    #     "Programming Language :: Python :: 3",
-    #     "Programming Language :: Python :: 3.7",
-    # ],
+    license="GNU",
+    classifiers=[
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+    ],
     packages=["odmd"],
     include_package_data=False,
     install_requires=["numpy"],

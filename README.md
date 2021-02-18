@@ -70,3 +70,6 @@ BibTeX
 
 ## Date created:
 April 2017
+
+## License
+If you want to use this package, but find license permission an issue, pls contact me at `haozhang at alumni dot princeton dot edu`.
