@@ -34,16 +34,19 @@ At time k+1, the data matrices become X(k+1) = [x(k-w+2),x(k-w+3),…,x(k+1)], Y
 The time complexity (multiply–add operation for one iteration) is O(n^2), and space complexity is O(wn+2n^2), where n is the state dimension, and w is the window size.  
 
 ## Installation
+### Use pip
+```
+python -m pip install odmd
+```
+
+### Manual install
 ```
 git clone https://github.com/haozhg/odmd.git
 cd odmd/
-
-python3 -m venv .venv
-source .venv/bin/activate
-
 pip install -e .
 ```
 
+### Test
 To run tests
 ```
 cd tests/
