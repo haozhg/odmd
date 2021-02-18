@@ -23,6 +23,10 @@ The time complexity (multiply–add operation for one iteration) is O(n^2), and 
 Download online DMD and window DMD implementation from github
 `git clone https://github.com/haozhg/odmd.git`
 
+```
+pip install -e .
+```
+
 ## Implementation
 1.**OnlineDMD.m** implements **OnlineDMD** class in Matlab.  
 2.**WindomDMD.m** implements **WindowDMD** class in Matlab.  
