@@ -1,3 +1,5 @@
+% This file is from
+% https://github.com/cwrowley/dmdtools/blob/2a3a9a6caa8b57eabe03a581fb08dcbff582ffe8/matlab/StreamingDMD.m#L1
 %STREAMINGDMD  incrementally updated Dynamic Mode Decomposition
 % Usage:
 %   sdmd = StreamingDMD
