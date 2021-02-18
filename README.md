@@ -36,14 +36,21 @@ The time complexity (multiply–add operation for one iteration) is O(n^2), and 
 ## Installation
 ### Use pip
 ```
-python -m pip install odmd
+python3 -m pip install odmd
 ```
 
 ### Manual install
+Create virtual env if needed
+```
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Clone from github and install
 ```
 git clone https://github.com/haozhg/odmd.git
 cd odmd/
-pip install -e .
+python3 -m pip install -e .
 ```
 
 ### Test
