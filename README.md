@@ -1,12 +1,11 @@
 # odmd
-Python/Matlab implementation of online dynamic mode decomposition (Online DMD) and window dynamic mode decomposition (Window DMD) algorithms proposed in this [paper](https://epubs.siam.org/doi/pdf/10.1137/18M1192329).
+Python implementation of online dynamic mode decomposition (Online DMD) and window dynamic mode decomposition (Window DMD) algorithms proposed in this [paper](https://epubs.siam.org/doi/pdf/10.1137/18M1192329). For matlabe implementation, see [this repo](https://github.com/haozhg/odmd-matlab).
 
 ## Hightlights
 - The online algorithm is optimal in terms of both time and space complexity. Its time complxity is O(n^2), where n is the state dimension. This is much faster than standard algorithm O(n^3). Its space complexity is O(n^2), which is much more efficient than standard algorithm O(n*T), where T is the number of measurements (T >> n, and will go to infinity in online applications)
 - It finds the exact optimal solution, without any approximation (Unlike stochastic gradient descent). 
 - It is a very general algorithm, and applies to problems other than fluid dynamics, dynamical systems, and control. If we have a function (or a dynamical model) y = M*phi(x), where phi is some known arbitrary nonlinear vector-valued function, x, y are vectors, M is an unknown matrix, and measurement x, y comes in real-time, then this algorithm updates the model M optimally. This form is very general, and can represent a very large class of models such as LTI, Lorenz attractor, polynomial system, vector AR, and many more.
-- It can be used for model predictive control.
-- It has been successfully applied to flow control problems, and achived great real-time closed loop control. See this [paper](https://doi.org/10.1017/jfm.2020.546) for details.
+- It can be used for model predictive control. For example, it has been successfully applied to flow control problems, and achived great real-time closed loop control. See this [paper](https://doi.org/10.1017/jfm.2020.546) for details.
 
 ## Installation
 ### Use pip
