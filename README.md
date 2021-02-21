@@ -94,7 +94,7 @@ From now on, we will denote y(t) = z(t) and x(t) = z(t-1), so that the dynamical
 - y(t) = f(t, x(t))
 
 ### Online DMD algorithm description
-The algorithm is implemented in class [OnlineDMD](./odmd/online.py).
+The algorithm is implemented in class [OnlineDMD](./odmd/_online.py).
 
 At time step t, define two matrix 
 - X(t) = [x(1),x(2),...,x(t)],
@@ -121,7 +121,7 @@ We need to incorporate a new snapshot pair x(t+1), y(t+1) into the least-square 
 - and space complexity is O(n^2), where n is the state dimension.  
 
 ### Window DMD algorithm description
-The algorithm is implemented in class [WindowDMD](./odmd/window.py).
+The algorithm is implemented in class [WindowDMD](./odmd/_window.py).
 
 At time step t, define two matrix 
 - X(t) = [x(t-w+1),x(t-w+2),...,x(t)], 
