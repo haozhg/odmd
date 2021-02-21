@@ -1,5 +1,6 @@
 import logging
 from collections import deque
+from typing import Tuple
 
 import numpy as np
 
@@ -13,25 +14,28 @@ class WindowDMD:
     the window size.
 
     Algorithm description:
-        At time step k, define two matrix X(k) = [x(k-w+1),x(k-w+2),...,x(k)],
-        Y(k) = [y(k-w+1),y(k-w+2),...,y(k)], that contain the recent w snapshot
-        pairs from a finite time window, where x(k), y(k) are the n dimensional
-        state vector, y(k) = f(x(k)) is the image of x(k), f() is the dynamics.
-        Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)),
-        then x(k), y(k) should be measurements correponding to consecutive
-        states z(k-1) and z(k).
-        At time k+1, we need to forget the old snapshot pair xold = x(k-w+1),
-        yold = y(k-w+1), and remember the new snapshot pair x = x(k+1),
-        y = y(k+1).
+        At time step t, define two matrix X(t) = [x(t-w+1),x(t-w+2),...,x(t)],
+        Y(t) = [y(t-w+1),y(t-w+2),...,y(t)], that contain the recent w snapshot
+        pairs from a finite time window, where x(t), y(t) are the n dimensional
+        state vector, y(t) = f(x(t)) is the image of x(t), f() is the dynamics.
+
+        Here, if the (discrete-time) dynamics are given by z(t) = f(z(t-1)),
+        then x(t), y(t) should be measurements correponding to consecutive
+        states z(t-1) and z(t).
+
+        At time t+1, we need to forget the old snapshot pair xold = x(t-w+1),
+        yold = y(t-w+1), and remember the new snapshot pair x = x(t+1),
+        y = y(t+1).
+
         We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively
         by efficient rank-2 updating window DMD algrithm.
         An exponential weighting factor can be used to place more weight on
         recent data.
 
     Usage:
-        wdmd = WindowDMD(n,w)
-        wdmd.initialize(Xw,Yw) # this is necessary
-        wdmd.update(x,y)
+        wdmd = WindowDMD(n, w)
+        wdmd.initialize(Xw, Yw) # this is necessary for window DMD
+        wdmd.update(x, y)
         evals, modes = wdmd.computemodes()
 
     properties:
@@ -46,7 +50,7 @@ class WindowDMD:
 
     methods:
         initialize(Xw, Yw), initialize window DMD algorithm with w snapshot pairs, this is necessary
-        update(x,y), update DMD computation by adding a new snapshot pair
+        update(x, y), update DMD computation by adding a new snapshot pair
         computemodes(), compute and return DMD eigenvalues and DMD modes
 
     Authors:
@@ -61,7 +65,7 @@ class WindowDMD:
     Date created: April 2017
     """
 
-    def __init__(self, n: int, w: int, weighting: float = 1):
+    def __init__(self, n: int, w: int, weighting: float = 1) -> None:
         """
         Creat an object for window DMD
         Usage: wdmd = WindowDMD(n,w,weighting)
@@ -81,9 +85,13 @@ class WindowDMD:
         # need to call initialize before update() and computemodes()
         self.ready = False
 
-    def initialize(self, Xw, Yw):
+    def initialize(self, Xw: np.ndarray, Yw: np.ndarray) -> None:
         """Initialize window DMD with first w snapshot pairs stored in (Xw, Yw)
-        Usage: wdmd.initialize(Xw,Yw)
+        Usage: wdmd.initialize(Xw, Yw)
+
+        Args:
+            Xw (np.ndarray): 2D array, shape (n, w), matrix [x(1),x(2),...x(w)]
+            Yw (np.ndarray): 2D array, shape (n, w), matrix [y(1),y(2),...y(w)]
         """
         assert Xw is not None and Yw is not None
         Xw, Yw = np.array(Xw), np.array(Yw)
@@ -105,18 +113,26 @@ class WindowDMD:
             self.timestep += q
         self.ready = True
 
-    def update(self, x, y):
+    def update(self, x: np.ndarray, y: np.ndarray) -> None:
         """Update the DMD computation by sliding the finite time window forward
         Forget the oldest pair of snapshots (xold, yold), and remembers the newest
         pair of snapshots (x, y) in the new time window. If the new finite
-        time window at time step k+1 includes recent w snapshot pairs as
-        X(k+1) = [x(k-w+2),x(k-w+3),...,x(k+1)], Y(k+1) = [y(k-w+2),y(k-w+3),
-        ...,y(k+1)], where y(k) = f(x(k)) and f is the dynamics, then we should
-        take x = x(k+1), y = y(k+1)
+        time window at time step t+1 includes recent w snapshot pairs as
+        X(t+1) = [x(t-w+2),x(t-w+3),...,x(t+1)], Y(t+1) = [y(t-w+2),y(t-w+3),
+        ...,y(t+1)], where y(t) = f(x(t)) and f is the dynamics, then we should
+        take x = x(t+1), y = y(t+1)
         Usage: wdmd.update(x, y)
+
+        Args:
+            x (np.ndarray): 1D array, shape (n, ), x(t) as in y(t) = f(t, x(t))
+            y (np.ndarray): 1D array, shape (n, ), x(t) as in y(t) = f(t, x(t))
+
+        Raises:
+            Exception: if Not initialized yet! Need to call self.initialize(Xw, Yw)
         """
         if not self.ready:
-            raise Exception("Not initialized yet! Need to call self.initialize(Xw, Yw)")
+            raise Exception(
+                "Not initialized yet! Need to call self.initialize(Xw, Yw)")
 
         assert x is not None and y is not None
         x, y = np.array(x), np.array(y)
@@ -150,11 +166,18 @@ class WindowDMD:
         # time step + 1
         self.timestep += 1
 
-    def computemodes(self):
+    def computemodes(self) -> Tuple[np.ndarray, np.ndarray]:
         """Compute and return DMD eigenvalues and DMD modes at current time step
         Usage: evals, modes = wdmd.computemodes()
+
+        Raises:
+            Exception: if Not initialized yet! Need to call self.initialize(Xw, Yw)
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: DMD eigenvalues and DMD modes
         """
         if not self.ready:
-            raise Exception("Not initialized yet! Need to call self.initialize(Xw, Yw)")
+            raise Exception(
+                "Not initialized yet! Need to call self.initialize(Xw, Yw)")
         evals, modes = np.linalg.eig(self.A)
         return evals, modes

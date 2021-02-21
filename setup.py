@@ -7,16 +7,16 @@ with open("README.md", "r") as f:
 # This call to setup() does all the work
 setup(
     name="odmd",
-    version="0.1.0",
+    version="0.1.1",
     description="Online and Window Dynamic Mode Decomposition algorithms",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/haozhg/odmd",
     author="Hao Zhang",
     author_email="haozhang@alumni.princeton.edu",
-    license="GNU",
+    license="MIT",
     classifiers=[
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
     ],
