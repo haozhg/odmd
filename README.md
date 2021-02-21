@@ -186,4 +186,4 @@ If you want to use this package, but find license permission an issue, pls conta
 ## Issues
 If there is any comment/suggestion, or if you find any bug, feel free to 
 - create an issue [here](https://github.com/haozhg/osysid/issues), or
-- fork this repo, and make changes, and create a pull request (merge from your fork to this repo)
+- fork this repo, make changes, and create a pull request (merge from your fork to this repo)
