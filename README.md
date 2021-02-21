@@ -6,6 +6,11 @@ To get started,
 pip install odmd
 ```
 
+A variant of this algorithm for efficient adaptive online linear/nonlinear model learning (system identification) and control is implemented in [osysid](https://github.com/haozhg/osysid). This algorithm has been show to be effective for flow separation control, see this [paper](https://doi.org/10.1017/jfm.2020.546) for more details.
+```
+pip install osysid
+```
+
 ## Showcase: 2D linear time-varying system
 We take a 2D time varying system given by 
 - dx/dt = A(t)x
