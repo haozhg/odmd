@@ -21,7 +21,7 @@ class OnlineDMD:
         then x(t), y(t) should be measurements correponding to consecutive
         states z(t-1) and z(t).
 
-        We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively
+        We would like to update the DMD matrix A(t) recursively
         by efficient rank-1 updating online DMD algrithm.
         An exponential weighting factor can be used to place more weight on
         recent data.
@@ -57,12 +57,19 @@ class OnlineDMD:
     Date created: April 2017
     """
 
-    def __init__(self, n: int, weighting: float = 1.0) -> None:
-        """
-        Creat an object for online DMD
+    def __init__(self, n: int, weighting: float = 0.9) -> None:
+        """Creat an object for online DMD
         Usage: odmd = OnlineDMD(n, weighting)
+
+        Args:
+            n (int): state dimension x(t) as in  z(t) = f(z(t-1)) or y(t) = f(t, x(t))
+            weighting (float, optional): exponential weighting factor
+                smaller value allows more adpative learning, 
+                but too small weighting may result in model identification instability (relies only on limited recent snapshots). 
+                Defaults to 0.9.
         """
         assert isinstance(n, int) and n >= 1
+        weighting = float(weighting)
         assert weighting > 0 and weighting <= 1
 
         self.n = n
@@ -72,6 +79,7 @@ class OnlineDMD:
         self._P = np.zeros([n, n])
         # initialize
         self._initialize()
+        self.ready = False
 
     def _initialize(self) -> None:
         """Initialize online DMD with epsilon small (1e-15) ghost snapshot pairs before t=0"""
@@ -94,16 +102,17 @@ class OnlineDMD:
         assert Xp.shape == Yp.shape
         assert Xp.shape[0] == self.n
         # necessary condition for over-constrained initialization
-        assert Xp.shape[1] >= self.n
+        p = Xp.shape[1]
+        assert p >= self.n and np.linalg.matrix_rank(Xp) == self.n
 
-        p = len(Xp[0, :])
-        Xqhat, Yqhat = np.zeros(Xp.shape), np.zeros(Yp.shape)
-        if self.timestep == 0 and np.linalg.matrix_rank(Xp) == self.n:
-            weight = np.sqrt(self.weighting) ** range(p - 1, -1, -1)
-            Xqhat, Yqhat = weight * Xp, weight * Yp
-            self.A = Yqhat.dot(np.linalg.pinv(Xqhat))
-            self._P = np.linalg.inv(Xqhat.dot(Xqhat.T)) / self.weighting
-            self.timestep += p
+        weight = np.sqrt(self.weighting) ** range(p - 1, -1, -1)
+        Xqhat, Yqhat = weight * Xp, weight * Yp
+        self.A = Yqhat.dot(np.linalg.pinv(Xqhat))
+        self._P = np.linalg.inv(Xqhat.dot(Xqhat.T)) / self.weighting
+        self.timestep += p
+
+        if self.timestep >= 2 * self.n:
+            self.ready = True
 
     def update(self, x: np.ndarray, y: np.ndarray) -> None:
         """Update the DMD computation with a new pair of snapshots (x,y)
@@ -135,12 +144,20 @@ class OnlineDMD:
         # time step + 1
         self.timestep += 1
 
+        if self.timestep >= 2 * self.n:
+            self.ready = True
+
     def computemodes(self) -> Tuple[np.ndarray, np.ndarray]:
         """Compute and return DMD eigenvalues and DMD modes at current time step
         Usage: evals, modes = odmd.computemodes()
 
+        Raises:
+            Exception: if Model not ready! Have not seen enough data!
+
         Returns:
-            Tuple[np.ndarray, np.ndarray]: DMD eigenvalues and DMD modes
+            Tuple[np.ndarray, np.ndarray]: DMD eigenvalues (2D array) and DMD modes (2D array)
         """
+        if not self.ready:
+            raise Exception(f"Model not ready! Have not seen enough data!")
         evals, modes = np.linalg.eig(self.A)
         return evals, modes

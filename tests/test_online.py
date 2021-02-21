@@ -14,8 +14,8 @@ def test_online():
 
         # run online DMD
         # no need to initialize
-        onlinedmd = OnlineDMD(n)
+        onlinedmd = OnlineDMD(n, 0.9)
         for t in range(T):
             onlinedmd.update(X[:, t], Y[:, t])
-            if t >= 2 * n:
+            if onlinedmd.ready:
                 assert np.linalg.norm(onlinedmd.A - A) < EPS

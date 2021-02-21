@@ -12,11 +12,12 @@ def test_window():
         Y = A.dot(X)
 
         # run window DMD
-        windowdmd = WindowDMD(n, 2 * n)
+        w = 2 * n
+        windowdmd = WindowDMD(n, w, 0.9)
         # initialize
-        windowdmd.initialize(X[:, : 2 * n], Y[:, : 2 * n])
+        windowdmd.initialize(X[:, : w], Y[:, : w])
         # online update
         for t in range(2 * n, T):
             windowdmd.update(X[:, t], Y[:, t])
-            if t >= 2 * n:
+            if windowdmd.ready:
                 assert np.linalg.norm(windowdmd.A - A) < EPS
