@@ -7,7 +7,7 @@ with open("README.md", "r") as f:
 # This call to setup() does all the work
 setup(
     name="odmd",
-    version="0.1.2",
+    version="0.1.3",
     description="Online and Window Dynamic Mode Decomposition algorithms",
     long_description=long_description,
     long_description_content_type="text/markdown",
