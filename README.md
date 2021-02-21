@@ -19,7 +19,7 @@ Here we show how the proposed algorithm can be used to learn a model of the syst
 ### Time-varying state evolution
 The system is oscillating with increasing frequency (frequency increased from 1 to 2 in 10 secs).
 <p align="center">
-  <img src="assets/state.png" width="400" />
+  <img src="https://github.com/haozhg/odmd/blob/master/assets/state.png" width="400" />
 </p>
 
 ### Tracking eigenvalues with online/window DMD
@@ -28,8 +28,8 @@ If we apply online/window DMD, the learned model can track the time-varying eige
 - Window DMD is designed to better track time-varying dynamics, even if no weighting is used.
 
 <p align="center">
-  <img src="assets/online_eval.png" width="400" />
-  <img src="assets/window_eval.png" width="400" /> 
+  <img src="https://github.com/haozhg/odmd/blob/master/assets/online_eval.png" width="400" />
+  <img src="https://github.com/haozhg/odmd/blob/master/assets/window_eval.png" width="400" /> 
 </p>
 
 ## Hightlights
