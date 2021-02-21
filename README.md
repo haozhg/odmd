@@ -17,7 +17,7 @@ where x = [x1,x2]', A(t) = [0, w(t); -w(t), 0], w(t)=1+epsilon*t, epsilon=0.1. T
 Here we show how the proposed algorithm can be used to learn a model of the system. For more detail, see [demo](https://github.com/haozhg/odmd/tree/master/demo).
 
 ### Time-varying state evolution
-We can tell that the oscillation frequency is increasing with time.
+The system is oscillating with increasing frequency (frequency increased from 1 to 2 in 10 secs).
 <p align="center">
   <img src="assets/state.png" width="400" />
 </p>
