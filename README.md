@@ -6,6 +6,30 @@ To get started,
 pip install odmd
 ```
 
+## Showcase: 2D linear time-varying system
+We take a 2D time varying system given by 
+- dx/dt = A(t)x
+
+where x = [x1,x2]', A(t) = [0,w(t);-w(t),0], w(t)=1+epsilon*t, epsilon=0.1. The slowly time varying eigenvlaues of A(t) are pure imaginary, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary unit.
+
+Here we show how the proposed algorithm can be used to learn a model of the system. For more details, see [demo](https://github.com/haozhg/odmd/tree/master/demo).
+
+### Time-varying state evolution
+
+<p align="center">
+  <img src="assets/state.png" width="300" />
+</p>
+
+### Tracking eigenvalues with online/window DMD
+If we apply online/window DMD, the learned model can track the eigenvalues very well.
+
+<p align="center">
+  <img src="assets/online_eval.png" width="300" />
+  <img src="assets/window_eval.png" width="300" /> 
+</p>
+
+We can tell that the weighting factor makes the learned model much more adaptive and tracks the true eigenvalues closely.
+
 ## Hightlights
 Here are some hightlights about this algorithm, and for more detail refer to this [paper](https://epubs.siam.org/doi/pdf/10.1137/18M1192329)
 
@@ -158,4 +182,4 @@ MIT
 If you want to use this package, but find license permission an issue, pls contact me at `haozhang at alumni dot princeton dot edu`.
 
 ## Issues
-If there is any comment/suggestion, or if you find any bug, feel free to create an issue [here](https://github.com/haozhg/osysid/issues), and contact me by email.
+If there is any comment/suggestion, or if you find any bug, feel free to create an issue [here](https://github.com/haozhg/odmd/issues), and contact me by email.
