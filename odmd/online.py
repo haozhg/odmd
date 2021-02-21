@@ -1,4 +1,5 @@
 import logging
+from typing import Tuple
 
 import numpy as np
 
@@ -11,22 +12,24 @@ class OnlineDMD:
     and space complexity is O(2n^2), where n is the state dimension.
 
     Algorithm description:
-        At time step k, define two matrix X(k) = [x(1),x(2),...,x(k)],
-        Y(k) = [y(1),y(2),...,y(k)], that contain all the past snapshot pairs,
-        where x(k), y(k) are the n dimensional state vector, y(k) = f(x(k)) is
-        the image of x(k), f() is the dynamics.
-        Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)),
-        then x(k), y(k) should be measurements correponding to consecutive
-        states z(k-1) and z(k).
+        At time step t, define two matrix X(t) = [x(1),x(2),...,x(t)],
+        Y(t) = [y(1),y(2),...,y(t)], that contain all the past snapshot pairs,
+        where x(t), y(t) are the n dimensional state vector, y(t) = f(x(t)) is
+        the image of x(t), f() is the dynamics.
+
+        Here, if the (discrete-time) dynamics are given by z(t) = f(z(t-1)),
+        then x(t), y(t) should be measurements correponding to consecutive
+        states z(t-1) and z(t).
+
         We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively
         by efficient rank-1 updating online DMD algrithm.
         An exponential weighting factor can be used to place more weight on
         recent data.
 
     Usage:
-        odmd = OnlineDMD(n,weighting)
-        odmd.initialize(Xq,Yq) # optional
-        odmd.update(x,y)
+        odmd = OnlineDMD(n, weighting)
+        odmd.initialize(Xp, Yp) # optional
+        odmd.update(x, y)
         evals, modes = odmd.computemodes()
 
     properties:
@@ -36,9 +39,9 @@ class OnlineDMD:
         A: DMD matrix, size n by n
 
     methods:
-        initialize(Xq=None, Yq=None), initialize online DMD algorithm with first q
-                            snapshot pairs stored in (Xq, Yq), this func call is optional
-        update(x,y), update DMD computation when new snapshot pair (x,y)
+        initialize(Xp, Yp), initialize online DMD algorithm with first p
+                            snapshot pairs stored in (Xp, Yp), this func call is optional
+        update(x, y), update DMD computation when new snapshot pair (x,y)
                             becomes available
         computemodes(), compute and return DMD eigenvalues and DMD modes
 
@@ -54,10 +57,10 @@ class OnlineDMD:
     Date created: April 2017
     """
 
-    def __init__(self, n: int, weighting: float = 1.0):
+    def __init__(self, n: int, weighting: float = 1.0) -> None:
         """
         Creat an object for online DMD
-        Usage: odmd = OnlineDMD(n,weighting)
+        Usage: odmd = OnlineDMD(n, weighting)
         """
         assert isinstance(n, int) and n >= 1
         assert weighting > 0 and weighting <= 1
@@ -70,39 +73,48 @@ class OnlineDMD:
         # initialize
         self._initialize()
 
-    def _initialize(self):
+    def _initialize(self) -> None:
         """Initialize online DMD with epsilon small (1e-15) ghost snapshot pairs before t=0"""
         epsilon = 1e-15
         alpha = 1.0 / epsilon
         self.A = np.random.randn(self.n, self.n)
-        self._P = alpha * np.identity(self.n)
+        self._P = alpha * np.identity(self.n)  # inverse of cov(X)
 
-    def initialize(self, Xq, Yq):
-        """Initialize online DMD with first q (q >= n) snapshot pairs stored in (Xq, Yq)
-        Usage: odmd.initialize(Xq,Yq)
+    def initialize(self, Xp: np.ndarray, Yp: np.ndarray) -> None:
+        """Initialize online DMD with first p (p >= n) snapshot pairs stored in (Xp, Yp)
+        Usage: odmd.initialize(Xp, Yp)
+
+        Args:
+            Xp (np.ndarray): 2D array, shape (n, p), matrix [x(1),x(2),...x(p)]
+            Yp (np.ndarray): 2D array, shape (n, p), matrix [y(1),y(2),...y(p)]
         """
-        assert Xq is not None and Yq is not None
-        Xq, Yq = np.array(Xq), np.array(Yq)
-        assert Xq.shape == Yq.shape
-        assert Xq.shape[0] == self.n
-        # necessary condition for over-constrained initialization
-        assert Xq.shape[1] >= self.n
 
-        q = len(Xq[0, :])
-        Xqhat, Yqhat = np.zeros(Xq.shape), np.zeros(Yq.shape)
-        if self.timestep == 0 and np.linalg.matrix_rank(Xq) == self.n:
-            weight = np.sqrt(self.weighting) ** range(q - 1, -1, -1)
-            Xqhat, Yqhat = weight * Xq, weight * Yq
+        assert Xp is not None and Yp is not None
+        Xp, Yp = np.array(Xp), np.array(Yp)
+        assert Xp.shape == Yp.shape
+        assert Xp.shape[0] == self.n
+        # necessary condition for over-constrained initialization
+        assert Xp.shape[1] >= self.n
+
+        p = len(Xp[0, :])
+        Xqhat, Yqhat = np.zeros(Xp.shape), np.zeros(Yp.shape)
+        if self.timestep == 0 and np.linalg.matrix_rank(Xp) == self.n:
+            weight = np.sqrt(self.weighting) ** range(p - 1, -1, -1)
+            Xqhat, Yqhat = weight * Xp, weight * Yp
             self.A = Yqhat.dot(np.linalg.pinv(Xqhat))
             self._P = np.linalg.inv(Xqhat.dot(Xqhat.T)) / self.weighting
-            self.timestep += q
+            self.timestep += p
 
-    def update(self, x, y):
+    def update(self, x: np.ndarray, y: np.ndarray) -> None:
         """Update the DMD computation with a new pair of snapshots (x,y)
-        Here, if the (discrete-time) dynamics are given by z(k) = f(z(k-1)),
+        Here, if the (discrete-time) dynamics are given by z(t) = f(z(t-1)),
         then (x,y) should be measurements correponding to consecutive states
-        z(k-1) and z(k).
+        z(t-1) and z(t).
         Usage: odmd.update(x, y)
+
+        Args:
+            x (np.ndarray): 1D array, shape (n, ), x(t) as in y(t) = f(t, x(t))
+            y (np.ndarray): 1D array, shape (n, ), y(t) as in y(t) = f(t, x(t))
         """
         assert x is not None and y is not None
         x, y = np.array(x), np.array(y)
@@ -123,9 +135,12 @@ class OnlineDMD:
         # time step + 1
         self.timestep += 1
 
-    def computemodes(self):
+    def computemodes(self) -> Tuple[np.ndarray, np.ndarray]:
         """Compute and return DMD eigenvalues and DMD modes at current time step
         Usage: evals, modes = odmd.computemodes()
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: DMD eigenvalues and DMD modes
         """
         evals, modes = np.linalg.eig(self.A)
         return evals, modes
