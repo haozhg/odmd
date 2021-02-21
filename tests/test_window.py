@@ -6,9 +6,9 @@ EPS = 1e-6
 
 def test_window():
     for n in range(2, 10):
-        m = 100 * n
+        T = 100 * n
         A = np.random.randn(n, n)
-        X = np.random.randn(n, m)
+        X = np.random.randn(n, T)
         Y = A.dot(X)
 
         # run window DMD
@@ -16,7 +16,7 @@ def test_window():
         # initialize
         windowdmd.initialize(X[:, : 2 * n], Y[:, : 2 * n])
         # online update
-        for i in range(2 * n, m):
-            windowdmd.update(X[:, i], Y[:, i])
-            if i >= 2 * n:
+        for t in range(2 * n, T):
+            windowdmd.update(X[:, t], Y[:, t])
+            if t >= 2 * n:
                 assert np.linalg.norm(windowdmd.A - A) < EPS
