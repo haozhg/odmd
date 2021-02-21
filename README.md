@@ -1,44 +1,41 @@
 # odmd
-Python implementation of online dynamic mode decomposition (Online DMD) and window dynamic mode decomposition (Window DMD) algorithms proposed in this [paper](https://epubs.siam.org/doi/pdf/10.1137/18M1192329). For matlabe implementation, see [this repo](https://github.com/haozhg/odmd-matlab).
+A python package for online dynamic mode decomposition (Online DMD) and window dynamic mode decomposition (Window DMD) algorithms proposed in this [paper](https://epubs.siam.org/doi/pdf/10.1137/18M1192329). For matlab implementation, see [this repo](https://github.com/haozhg/odmd-matlab).
 
 To get started,
 ```
-pip install odmd
+pip install odmd --upgrade
 ```
 
-A variant of this algorithm for efficient adaptive online linear/nonlinear model learning (system identification) and control is implemented in [osysid](https://github.com/haozhg/osysid). This algorithm has been show to be effective for flow separation control, see this [paper](https://doi.org/10.1017/jfm.2020.546) for more details.
-```
-pip install osysid
-```
+A variant of this algorithm for efficient data-driven online model learning (system identification) and control is implemented in [osysid](https://github.com/haozhg/osysid) (try `pip install osysid --upgrade`). This algorithm has been show to be effective for flow separation control, see this [paper](https://doi.org/10.1017/jfm.2020.546) for more details.
 
 ## Showcase: 2D linear time-varying system
-We take a 2D time varying system given by 
+We take a 2D time-varying system given by 
 - dx/dt = A(t)x
 
-where x = [x1,x2]', A(t) = [0,w(t);-w(t),0], w(t)=1+epsilon*t, epsilon=0.1. The slowly time varying eigenvlaues of A(t) are pure imaginary, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary unit.
+where x = [x1,x2]', A(t) = [0, w(t); -w(t), 0], w(t)=1+epsilon*t, epsilon=0.1. The slowly time-varying eigenvlaues of A(t) are pure imaginary, +(1+0.1t)j and -(1+0.1t)j, where j is the imaginary unit.
 
-Here we show how the proposed algorithm can be used to learn a model of the system. For more details, see [demo](https://github.com/haozhg/odmd/tree/master/demo).
+Here we show how the proposed algorithm can be used to learn a model of the system. For more detail, see [demo](https://github.com/haozhg/odmd/tree/master/demo).
 
 ### Time-varying state evolution
-
+The system is oscillating with increasing frequency (frequency increased from 1 to 2 in 10 secs).
 <p align="center">
   <img src="https://github.com/haozhg/odmd/blob/master/assets/state.png" width="400" />
 </p>
 
 ### Tracking eigenvalues with online/window DMD
-If we apply online/window DMD, the learned model can track the eigenvalues very well.
+If we apply online/window DMD, the learned model can track the time-varying eigenvalues very well. 
+- Online DMD with weighting factor makes the learned model much more adaptive and tracks the true eigenvalues closely.
+- Window DMD is designed to better track time-varying dynamics, even if no weighting is used.
 
 <p align="center">
   <img src="https://github.com/haozhg/odmd/blob/master/assets/online_eval.png" width="400" />
   <img src="https://github.com/haozhg/odmd/blob/master/assets/window_eval.png" width="400" /> 
 </p>
 
-We can tell that the weighting factor makes the learned model much more adaptive and tracks the true eigenvalues closely.
-
 ## Hightlights
-Here are some hightlights about this algorithm, and for more detail refer to this [paper](https://epubs.siam.org/doi/pdf/10.1137/18M1192329)
+Here are some hightlights about this algorithm, and for more detail please refer to this [paper](https://epubs.siam.org/doi/pdf/10.1137/18M1192329)
 
-- Efficient adaptive online linear/nonlinear model learning (system identification). Any nonlinear and/or time-varying system is locally linear, as long as the model is updated in real-time wrt to new measurements.
+- Efficient data-driven online linear/nonlinear model learning (system identification). Any nonlinear and/or time-varying system is locally linear, as long as the model is updated in real-time wrt to new measurements.
 - It finds the exact optimal solution (in the sense of least square error), without any approximation (unlike stochastic gradient descent). 
 - It achieves theoretical optimal time and space complexity. 
 - The time complexity (flops for one iteration) is O(n^2), where n is state dimension. This is much faster than standard algorithm O(n^2 * t), where t is the current time step (number of measurements). In online applications, t >> n and essentially will go to infinity.
@@ -46,10 +43,10 @@ Here are some hightlights about this algorithm, and for more detail refer to thi
 - A weighting factor (in (0, 1]) can be used to place more weight on recent data, thus making the model more adaptive.
 - It has been successfully applied to flow separation control problem, and achived real-time closed loop control. See this [paper](https://doi.org/10.1017/jfm.2020.546) for details.
 
-## Installation
+## Install
 ### Use pip
 ```
-python3 -m pip install odmd
+pip install odmd --upgrade
 ```
 
 ### Manual install
@@ -86,7 +83,7 @@ where t is (discrete) time, z(t) is state vector.
 In general, a variant of this algorithm (try `pip install osysid`, see [here](https://github.com/haozhg/osysid)) also works if we have a nonlinear and/or time-varying map
 - y(t) = f(t, x(t))
 
-where x(t) is the input and y(t) is the output. Notice that dynamical system is a special case of this model, by taking y(t) = z(t) and x(t) = z(t-1).
+where x(t) is the input and y(t) is the output. Notice that dynamical system is a special case of nonlinear maps, by taking y(t) = z(t) and x(t) = z(t-1).
 
 - It is assumed that we have measurements z(t) for t = 0,1,...T. 
 - However, we do not know function f. 
@@ -105,7 +102,7 @@ At time step t, define two matrix
 
 that contain all the past snapshot pairs, where x(t), y(t) are the n dimensional state vector, y(t) = f(t, x(t)) is the image of x(t), f() is the dynamics.  Here, if the (discrete-time) dynamics are given by z(t) = f(t, z(t-1)), then x(t), y(t) should be measurements corresponding to consecutive states z(t-1) and z(t).  
 
-We would like to learn an adaptive linear model M (a matrix) st 
+We would like to learn an adaptive online linear model M (a matrix) st 
 - y(t) = M * x(t)
 
 The matrix M is updated in real-time when new measurement becomes available. We aim to find the best M that leads to least-squre errors.
@@ -118,7 +115,7 @@ At time t+1, the matrices become
 - X(t+1) = [x(1),x(2),…,x(t),x(t+1)], 
 - Y(t+1) = [y(1),y(2),…,y(t),y(t+1)]. 
 
-We need to incorporate a new snapshot pair x(t+1), y(t+1) into the least-square objective function. We can update the DMD matrix Ak = Yk*pinv(Xk) recursively by efficient rank-1 updating online DMD algorithm.  
+We need to incorporate a new snapshot pair x(t+1), y(t+1) into the least-square objective function. We can update the DMD matrix A(t) online by efficient rank-1 updating online DMD algorithm.  
 
 - The time complexity (multiply–add operation for one iteration) is O(n^2), 
 - and space complexity is O(n^2), where n is the state dimension.  
@@ -142,15 +139,15 @@ At time t+1, the data matrices become
 - X(t+1) = [x(t-w+2),x(t-w+3),…,x(t+1)], 
 - Y(t+1) = [y(t-w+2),y(t-w+3),…,y(t+1)]. 
 
-The models needs to forget the oldest snapshot pair x(t-w+1),y(t-w+1), and remember the newest snapshot pair x(t+1),y(t+1). We can update the DMD matrix Ak = Yk*pinv(Xk) recursively by efficient rank-2 updating window DMD algroithm.  
+The models needs to forget the oldest snapshot pair x(t-w+1),y(t-w+1), and remember the newest snapshot pair x(t+1),y(t+1). We can update the DMD matrix A(t) online by efficient rank-2 updating window DMD algroithm.  
 
 - The time complexity (multiply–add operation for one iteration) is O(n^2), 
 - and space complexity is O(wn+2n^2), where n is the state dimension, and w is the window size. Typically w is taken to be O(n), e.g, w = 2n, or 10n.
 
-## Demos
+## Demo
 See [demo](./demo) for python notebooks.
-- `demo_online.ipynb` shows how to use online DMD to learn adaptive model for 2D time varying system.
-- `demo_window.ipynb` shows how to use online DMD to learn adaptive model for 2D time varying system.
+- `demo_online.ipynb` shows how to use online DMD to learn adaptive online model for 2D time varying system.
+- `demo_window.ipynb` shows how to use online DMD to learn adaptive online model for 2D time varying system.
 
 ## Authors:
 Hao Zhang 
@@ -187,4 +184,6 @@ MIT
 If you want to use this package, but find license permission an issue, pls contact me at `haozhang at alumni dot princeton dot edu`.
 
 ## Issues
-If there is any comment/suggestion, or if you find any bug, feel free to create an issue [here](https://github.com/haozhg/odmd/issues), and contact me by email.
+If there is any comment/suggestion, or if you find any bug, feel free to 
+- create an issue [here](https://github.com/haozhg/osysid/issues), or
+- fork this repo, make changes, and create a pull request (merge from your fork to this repo)

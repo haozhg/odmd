@@ -27,7 +27,7 @@ class WindowDMD:
         yold = y(t-w+1), and remember the new snapshot pair x = x(t+1),
         y = y(t+1).
 
-        We would like to update the DMD matrix Ak = Yk*pinv(Xk) recursively
+        We would like to update the DMD matrix A(t)
         by efficient rank-2 updating window DMD algrithm.
         An exponential weighting factor can be used to place more weight on
         recent data.
@@ -40,7 +40,7 @@ class WindowDMD:
 
     properties:
         n: state dimension
-        w: window size
+        w: window size, we must have w >= 2*n
         weighting: weighting factor in (0,1]
         timestep: number of snapshot pairs processed (i.e., current time step)
         Xw: recent w snapshots x stored in Xw, size n by w
@@ -65,13 +65,15 @@ class WindowDMD:
     Date created: April 2017
     """
 
-    def __init__(self, n: int, w: int, weighting: float = 1) -> None:
+    def __init__(self, n: int, w: int, weighting: float = 0.9) -> None:
         """
         Creat an object for window DMD
-        Usage: wdmd = WindowDMD(n,w,weighting)
+        Usage: wdmd = WindowDMD(n, w, weighting), we must have w >= 2*n
         """
+        # input check
         assert n >= 1 and isinstance(n, int)
         assert w >= 1 and isinstance(w, int)
+        assert w >= 2 * n
         assert weighting > 0 and weighting <= 1
 
         self.n = n
@@ -82,6 +84,7 @@ class WindowDMD:
         self.Yw = deque()
         self.A = np.zeros([n, n])
         self.P = np.zeros([n, n])
+
         # need to call initialize before update() and computemodes()
         self.ready = False
 
@@ -93,10 +96,12 @@ class WindowDMD:
             Xw (np.ndarray): 2D array, shape (n, w), matrix [x(1),x(2),...x(w)]
             Yw (np.ndarray): 2D array, shape (n, w), matrix [y(1),y(2),...y(w)]
         """
+        # input check
         assert Xw is not None and Yw is not None
         Xw, Yw = np.array(Xw), np.array(Yw)
         assert Xw.shape == Yw.shape
         assert Xw.shape == (self.n, self.w)
+        assert np.linalg.matrix_rank(Xw) == self.n
 
         # initialize Xw, Yw queue
         for i in range(self.w):
@@ -104,13 +109,17 @@ class WindowDMD:
             self.Yw.append(Yw[:, i])
 
         # initialize A, P
-        q = len(Xw[0, :])
-        if self.timestep == 0 and self.w == q and np.linalg.matrix_rank(Xw) == self.n:
-            weight = np.sqrt(self.weighting) ** range(q - 1, -1, -1)
-            Xwhat, Ywhat = weight * Xw, weight * Yw
-            self.A = Ywhat.dot(np.linalg.pinv(Xwhat))
-            self.P = np.linalg.inv(Xwhat.dot(Xwhat.T)) / self.weighting
-            self.timestep += q
+        # scale Xw Yw
+        weight = np.sqrt(self.weighting) ** range(self.w - 1, -1, -1)
+        Xwhat, Ywhat = weight * Xw, weight * Yw
+        # initialie A and P
+        self.A = Ywhat.dot(np.linalg.pinv(Xwhat))
+        self.P = np.linalg.inv(Xwhat.dot(Xwhat.T)) / self.weighting
+
+        # timestep
+        self.timestep += self.w
+
+        # mark the model as ready
         self.ready = True
 
     def update(self, x: np.ndarray, y: np.ndarray) -> None:
@@ -134,6 +143,7 @@ class WindowDMD:
             raise Exception(
                 "Not initialized yet! Need to call self.initialize(Xw, Yw)")
 
+        # input check
         assert x is not None and y is not None
         x, y = np.array(x), np.array(y)
 
