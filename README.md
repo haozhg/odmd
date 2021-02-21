@@ -22,15 +22,15 @@ Here we show how the proposed algorithm can be used to learn a model of the syst
 ### Time-varying state evolution
 
 <p align="center">
-  <img src="assets/state.png" width="400" />
+  <img src="https://github.com/haozhg/odmd/blob/master/assets/state.png" width="400" />
 </p>
 
 ### Tracking eigenvalues with online/window DMD
 If we apply online/window DMD, the learned model can track the eigenvalues very well.
 
 <p align="center">
-  <img src="assets/online_eval.png" width="400" />
-  <img src="assets/window_eval.png" width="400" /> 
+  <img src="https://github.com/haozhg/odmd/blob/master/assets/online_eval.png" width="400" />
+  <img src="https://github.com/haozhg/odmd/blob/master/assets/window_eval.png" width="400" /> 
 </p>
 
 We can tell that the weighting factor makes the learned model much more adaptive and tracks the true eigenvalues closely.
