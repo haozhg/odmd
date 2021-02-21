@@ -43,7 +43,7 @@ Here are some hightlights about this algorithm, and for more detail please refer
 - A weighting factor (in (0, 1]) can be used to place more weight on recent data, thus making the model more adaptive.
 - It has been successfully applied to flow separation control problem, and achived real-time closed loop control. See this [paper](https://doi.org/10.1017/jfm.2020.546) for details.
 
-## Installation
+## Install
 ### Use pip
 ```
 pip install odmd --upgrade
@@ -144,7 +144,7 @@ The models needs to forget the oldest snapshot pair x(t-w+1),y(t-w+1), and remem
 - The time complexity (multiply–add operation for one iteration) is O(n^2), 
 - and space complexity is O(wn+2n^2), where n is the state dimension, and w is the window size. Typically w is taken to be O(n), e.g, w = 2n, or 10n.
 
-## Demos
+## Demo
 See [demo](./demo) for python notebooks.
 - `demo_online.ipynb` shows how to use online DMD to learn adaptive online model for 2D time varying system.
 - `demo_window.ipynb` shows how to use online DMD to learn adaptive online model for 2D time varying system.
@@ -184,4 +184,6 @@ MIT
 If you want to use this package, but find license permission an issue, pls contact me at `haozhang at alumni dot princeton dot edu`.
 
 ## Issues
-If there is any comment/suggestion, or if you find any bug, feel free to create an issue [here](https://github.com/haozhg/odmd/issues), and contact me by email.
+If there is any comment/suggestion, or if you find any bug, feel free to 
+- create an issue [here](https://github.com/haozhg/osysid/issues), or
+- fork this repo, and make changes, and create a pull request (merge from your fork to this repo)
