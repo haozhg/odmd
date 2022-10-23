@@ -6,7 +6,7 @@ To get started,
 pip install odmd --upgrade
 ```
 
-A variant of this algorithm for efficient data-driven online model learning (system identification) and control is implemented in [osysid](https://github.com/haozhg/osysid) (try `pip install osysid --upgrade`). This algorithm has been show to be effective for flow separation control, see this [paper](https://doi.org/10.1017/jfm.2020.546) for more details.
+A variant of this algorithm for efficient data-driven online model learning (system identification) and control is implemented in [ai4sci.oml](https://github.com/haozhg/oml) (try `pip install ai4sci.oml --upgrade`). This algorithm has been show to be effective for flow separation control, see this [paper](https://doi.org/10.1017/jfm.2020.546) for more details.
 
 ## Showcase: 2D linear time-varying system
 We take a 2D time-varying system given by 
@@ -80,7 +80,7 @@ Suppose we have a (discrete) nonlinear and/or time-varying [dynamical system](ht
 
 where t is (discrete) time, z(t) is state vector.
 
-In general, a variant of this algorithm (try `pip install osysid`, see [here](https://github.com/haozhg/osysid)) also works if we have a nonlinear and/or time-varying map
+In general, a variant of this algorithm (try `pip install ai4sci.oml --upgrade`, see [here](https://github.com/haozhg/oml)) also works if we have a nonlinear and/or time-varying map
 - y(t) = f(t, x(t))
 
 where x(t) is the input and y(t) is the output. Notice that dynamical system is a special case of nonlinear maps, by taking y(t) = z(t) and x(t) = z(t-1).
@@ -185,5 +185,5 @@ If you want to use this package, but find license permission an issue, pls conta
 
 ## Issues
 If there is any comment/suggestion, or if you find any bug, feel free to 
-- create an issue [here](https://github.com/haozhg/osysid/issues), or
+- create an issue [here](https://github.com/haozhg/oml/issues), or
 - fork this repo, make changes, and create a pull request (merge from your fork to this repo)
